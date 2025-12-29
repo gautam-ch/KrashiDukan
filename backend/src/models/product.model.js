@@ -16,6 +16,9 @@ const productSchema = new Schema({
     category:{
         type:String
     },
+    sprayCount:{
+       type:Number,
+    },
     costPrice:{
         type:String,
         required:true,
