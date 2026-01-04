@@ -37,9 +37,15 @@ const productSchema = new Schema({
     quantity:{
         type:Number,
         required:true
+    },
+    shopId:{
+        type:Schema.Types.ObjectId,
+        ref:"Shop"
     }
 },{
     timestamps:true
 })
+
+productSchema.index({ shopId: 1 });
 
 export const Product = mongoose.model("Product",productSchema);
