@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import Session from "../models/session.model.js";
+import { Shop } from "../models/shop.model.js";
 
 
 export const signup = async (req, res) => {
@@ -149,4 +150,24 @@ export const refresh = async (req, res) => {
 
     res.status(200).json({ success: true, message: "Token created successfully!" })
 
+}
+
+export const me = async (req, res) => {
+    const userId = req.userId;
+    if (!userId) {
+        throw new ApiError(401, "Unauthorized request!");
+    }
+
+    const user = await User.findById(userId).select("_id name email role");
+    if (!user) {
+        throw new ApiError(401, "Unauthorized request!");
+    }
+
+    const shop = await Shop.findOne({ owners: { $in: [userId] } });
+
+    res.status(200).json({
+        success: true,
+        user,
+        shop: shop || null
+    });
 }

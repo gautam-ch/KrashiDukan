@@ -40,9 +40,16 @@ const orderSchema = new Schema({
     ],
     totalAmount: {
         type: Number
+    },
+    shopId:{
+        type: Schema.Types.ObjectId,
+        ref: "Shop",
+        required: true
     }
 }, {
     timestamps: true
 })
+
+orderSchema.index({shopId:1});
 
 export const Order = mongoose.model("Order", orderSchema);

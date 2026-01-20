@@ -1,4 +1,4 @@
-import { addProduct,getProducts } from "../controllers/product.controller";
+import { addProduct,getProducts } from "../controllers/product.controller.js";
 import {Router} from "express";
 import {verifyToken} from "../middleware/verifyToken.js"
 import { catchAsync } from "../utils/catchAsync.js";
