@@ -61,7 +61,7 @@ export function HomePage({ authed, shop, onCreateShop, onLogout }) {
           <p className="muted" style={{ margin: 0 }}>Krashi Dukan</p>
           <h1 className="title">Pesticide shop assistant</h1>
         </div>
-        <div className="row" style={{ position: "relative" }}>
+        <div className="row header-actions" style={{ position: "relative" }}>
           {authed ? (
             <>
               {shop && <button className="ghost" onClick={() => navigate("/dashboard")}>Dashboard</button>}
@@ -93,6 +93,36 @@ export function HomePage({ authed, shop, onCreateShop, onLogout }) {
             </>
           ) : null}
         </div>
+        {authed && (
+          <div className="header-menu">
+            <button
+              className="hamburger"
+              type="button"
+              onClick={() => setShowMenu((v) => !v)}
+              aria-haspopup="menu"
+              aria-expanded={showMenu}
+              aria-label="Open navigation menu"
+            >
+              ☰
+            </button>
+            {showMenu && (
+              <div className="mobile-menu" role="menu">
+                {shop ? (
+                  <button className="menu-item" onClick={() => { navigate("/dashboard"); setShowMenu(false); }}>
+                    Dashboard
+                  </button>
+                ) : (
+                  <button className="menu-item" onClick={() => { openModal(); setShowMenu(false); }}>
+                    Create shop
+                  </button>
+                )}
+                <button className="menu-item" onClick={() => { onLogout(); setShowMenu(false); }}>
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {authed && shop ? (

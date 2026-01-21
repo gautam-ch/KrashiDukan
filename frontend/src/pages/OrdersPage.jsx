@@ -13,6 +13,7 @@ export function OrdersPage({ shopId, onLogout }) {
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, totalCount: 0, limit: 20 });
   const [loading, setLoading] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   const loadOrders = useCallback(async ({ nextPage = 1, nextSearch = search } = {}) => {
     if (!shopId) return;
@@ -39,10 +40,29 @@ export function OrdersPage({ shopId, onLogout }) {
           <p className="muted" style={{ margin: 0 }}>Krashi Dukan</p>
           <h1 className="title">Order history</h1>
         </div>
-        <div className="row">
+        <div className="row header-actions">
           <button className="ghost" onClick={() => navigate("/dashboard")}>Dashboard</button>
           <button className="ghost" onClick={() => navigate("/search")}>Search</button>
           <button className="ghost" onClick={onLogout}>Logout</button>
+        </div>
+        <div className="header-menu">
+          <button
+            className="hamburger"
+            type="button"
+            onClick={() => setShowMenu((v) => !v)}
+            aria-haspopup="menu"
+            aria-expanded={showMenu}
+            aria-label="Open navigation menu"
+          >
+            ☰
+          </button>
+          {showMenu && (
+            <div className="mobile-menu" role="menu">
+              <button className="menu-item" onClick={() => { navigate("/dashboard"); setShowMenu(false); }}>Dashboard</button>
+              <button className="menu-item" onClick={() => { navigate("/search"); setShowMenu(false); }}>Search</button>
+              <button className="menu-item" onClick={() => { onLogout?.(); setShowMenu(false); }}>Logout</button>
+            </div>
+          )}
         </div>
       </div>
 
