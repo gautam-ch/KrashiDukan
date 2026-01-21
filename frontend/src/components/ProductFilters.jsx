@@ -1,7 +1,13 @@
-const sprayCounts = [5, 10, 15];
-const categories = ["chipko", "toxic", "pesticide", "fungicide", "insecticide"];
+const sprayCounts = [2, 5, 10, 20];
+const categories = [
+  "fertilizer",
+  "insecticide (sucking)",
+  "insecticide (chewing)",
+  "pesticide",
+  "fungicide",
+];
 
-export function ProductFilters({ filters, onChange, onExportCSV, onExportPDF }) {
+export function ProductFilters({ filters, onChange, onExportCSV, onExportPDF, onSearch, showSearchButton = false, showExports = true }) {
   const update = (field, val) => onChange?.({ ...filters, [field]: val });
   return (
     <div className="row">
@@ -14,10 +20,13 @@ export function ProductFilters({ filters, onChange, onExportCSV, onExportPDF }) 
         <option value="">Any spray</option>
         {sprayCounts.map((s) => <option key={s} value={s}>{s}</option>)}
       </select>
-      <div className="row">
-        <button className="ghost" onClick={onExportCSV}>Export CSV</button>
-        <button className="ghost" onClick={onExportPDF}>Export PDF</button>
-      </div>
+      {showSearchButton && <button onClick={onSearch}>Search</button>}
+      {showExports && (
+        <div className="row">
+          <button className="ghost" onClick={onExportCSV}>Export CSV</button>
+          <button className="ghost" onClick={onExportPDF}>Export PDF</button>
+        </div>
+      )}
     </div>
   );
 }

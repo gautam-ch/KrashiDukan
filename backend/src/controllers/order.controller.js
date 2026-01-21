@@ -31,9 +31,21 @@ export const  orderHistory = async(req,res)=>{
      const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 20)); // Default 20, max 50
      const offset = (page - 1) * limit;
 
+     const search = (req.query.search || "").trim();
+     const query = { shopId: Id };
+
+     if (search) {
+         const regex = new RegExp(search, "i");
+         query.$or = [
+             { name: regex },
+             { contact: regex },
+             { village: regex },
+         ];
+     }
+
      const [orders, totalCount] = await Promise.all([
-         Order.find({shopId:Id}).sort({createdAt:-1}).limit(limit).skip(offset),
-         Order.countDocuments({shopId:Id})
+         Order.find(query).sort({createdAt:-1}).limit(limit).skip(offset),
+         Order.countDocuments(query)
      ]);
 
      const totalPages = Math.ceil(totalCount / limit);

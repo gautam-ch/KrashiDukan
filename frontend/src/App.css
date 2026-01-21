@@ -236,6 +236,72 @@ button:hover:not(:disabled) {
 	width: 100%;
 }
 
+.modal-compact {
+	max-width: 460px;
+}
+
+.compact-input {
+	width: 90px;
+	padding: 6px 8px;
+	font-size: 13px;
+}
+
+.cart-card {
+	padding: 12px;
+	gap: 8px;
+}
+
+.cart-item {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 8px 0;
+	border-bottom: 1px dashed #111;
+}
+
+.cart-item:last-of-type {
+	border-bottom: none;
+}
+
+.cart-meta {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.cart-controls {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+}
+
+.cart-qty {
+	width: 70px;
+	padding: 6px 8px;
+}
+
+.cart-price {
+	font-weight: 600;
+}
+
+.cart-remove {
+	padding: 6px 10px;
+}
+
+.pagination {
+	display: flex;
+	gap: 6px;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+}
+
+.pagination button.active {
+	background: #111;
+	color: #fff;
+}
+
 .avatar {
 	width: 36px;
 	height: 36px;

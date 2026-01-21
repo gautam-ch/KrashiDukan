@@ -1,22 +1,15 @@
 import { ProductForm } from "../components/ProductForm";
-import { ProductFilters } from "../components/ProductFilters";
-import { ProductList } from "../components/ProductList";
 import { Cart } from "../components/Cart";
 import { OrderForm } from "../components/OrderForm";
-import { OrderHistory } from "../components/OrderHistory";
 import { ShopCard } from "../components/ShopCard";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export function DashboardPage({
   shop,
   productForm,
   onProductChange,
   onProductSubmit,
-  filters,
-  onFilterChange,
-  filteredProducts,
-  onExportProductsCSV,
-  onExportProductsPDF,
-  onAddToCart,
   cart,
   onCartQty,
   onCartRemove,
@@ -24,10 +17,12 @@ export function DashboardPage({
   orderForm,
   onOrderChange,
   onOrderSubmit,
-  orders,
   onLogout,
   onAddOwner,
 }) {
+  const navigate = useNavigate();
+  const [showOwnerModal, setShowOwnerModal] = useState(false);
+  const [ownerEmail, setOwnerEmail] = useState("");
   return (
     <div className="app-shell">
       <div className="header">
@@ -35,24 +30,19 @@ export function DashboardPage({
           <p className="muted" style={{ margin: 0 }}>Krashi Dukan</p>
           <h1 className="title">Pesticide shop console</h1>
         </div>
-        {onLogout && <button className="ghost" onClick={onLogout}>Logout</button>}
+        <div className="row">
+          <button className="ghost" onClick={() => navigate("/search")}>Search</button>
+          <button className="ghost" onClick={() => navigate("/orders")}>Orders</button>
+          <button className="ghost" onClick={() => setShowOwnerModal(true)}>Add owner</button>
+          {onLogout && <button className="ghost" onClick={onLogout}>Logout</button>}
+        </div>
       </div>
 
       <div className="grid">
-        <ShopCard shop={shop} onAddOwner={onAddOwner} />
+        <ShopCard shop={shop} onAddOwner={onAddOwner} inline />
         <ProductForm value={productForm} onChange={onProductChange} onSubmit={onProductSubmit} />
       </div>
 
-      <div className="card stack">
-        <h3>Products</h3>
-        <ProductFilters
-          filters={filters}
-          onChange={onFilterChange}
-          onExportCSV={onExportProductsCSV}
-          onExportPDF={onExportProductsPDF}
-        />
-        <ProductList products={filteredProducts} onAddToCart={onAddToCart} />
-      </div>
 
       <div className="grid">
         <Cart
@@ -69,7 +59,38 @@ export function DashboardPage({
         />
       </div>
 
-      <OrderHistory orders={orders} />
+      {showOwnerModal && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true">
+          <div className="modal card stack">
+            <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+              <h3 style={{ margin: 0 }}>Add owner</h3>
+              <button className="ghost" type="button" onClick={() => setShowOwnerModal(false)}>Close</button>
+            </div>
+            <form
+              className="stack"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                await onAddOwner?.(ownerEmail);
+                setOwnerEmail("");
+                setShowOwnerModal(false);
+              }}
+            >
+              <label>
+                Owner email
+                <input
+                  type="email"
+                  value={ownerEmail}
+                  onChange={(e) => setOwnerEmail(e.target.value)}
+                  placeholder="owner@example.com"
+                  required
+                />
+              </label>
+              <button type="submit">Send invite</button>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

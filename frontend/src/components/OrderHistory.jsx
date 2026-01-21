@@ -63,7 +63,7 @@ export function OrderHistory({ orders }) {
               </tr>
             ))}
             {orders.length === 0 && (
-              <tr><td colSpan={6} className="muted">No orders yet.</td></tr>
+              <tr><td colSpan={6} className="muted">No orders found.</td></tr>
             )}
           </tbody>
         </table>

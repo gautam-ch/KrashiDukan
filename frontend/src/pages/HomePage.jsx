@@ -84,7 +84,7 @@ export function HomePage({ authed, shop, onCreateShop, onLogout }) {
           <h2 style={{ margin: 0 }}>Track stock, owners, expiry, and orders in one clean console.</h2>
           <p className="muted" style={{ lineHeight: 1.5 }}>
             Sign up, invite owners by email, add pesticide inventory with spray count and category tags, see expiry colors,
-            take cart orders with customer village and contact, and export CSV/PDF backups for compliance.
+            and export CSV/PDF backups for compliance.
           </p>
           <div className="row">
             {authed ? (
@@ -108,7 +108,6 @@ export function HomePage({ authed, shop, onCreateShop, onLogout }) {
           </div>
           <ul className="muted feature-list">
             <li>Filter products by spray count or category to find the right fit fast.</li>
-            <li>Cart + checkout collects name, contact, and village for every buyer.</li>
             <li>Export order history and product inventory to CSV or PDF for backups.</li>
             <li>Invite shop owners by email—everyone works from the same dashboard.</li>
           </ul>

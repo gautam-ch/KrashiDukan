@@ -1,5 +1,13 @@
-const sprayCounts = [5, 10, 15];
-const categories = ["chipko", "toxic", "pesticide", "fungicide", "insecticide"];
+const sprayCounts = [2, 5, 10, 20];
+const categories = [
+  "fertilizer",
+  "insecticide (sucking)",
+  "insecticide (chewing)",
+  "pesticide",
+  "fungicide",
+  "chipko",
+  "toxic",
+];
 
 export function ProductForm({ value, onChange, onSubmit }) {
   const update = (field, val) => onChange?.({ ...value, [field]: val });
@@ -39,7 +47,7 @@ export function ProductForm({ value, onChange, onSubmit }) {
             <input type="number" value={value.quantity} onChange={(e) => update("quantity", e.target.value)} required />
           </label>
         </div>
-        <label>Tags (comma separated)
+        <label>Specification (comma separated)
           <input value={value.tags} onChange={(e) => update("tags", e.target.value)} />
         </label>
         <label>Image URL (optional)

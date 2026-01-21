@@ -31,7 +31,7 @@ export function ProductList({ products, onAddToCart }) {
           <button onClick={() => onAddToCart?.(p)}>Add to cart</button>
         </div>
       ))}
-      {products.length === 0 && <p className="muted">No products match the filter.</p>}
+      {products.length === 0 && <p className="muted">No products found.</p>}
     </div>
   );
 }
