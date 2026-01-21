@@ -15,6 +15,8 @@ const allowedOrigins = new Set([
       'http://127.0.0.1:5173',
       'http://localhost:5174',
       'http://127.0.0.1:5174',
+      'https://krashi-dukan.vercel.app',
+      'https://krashi-dukan-73mwkanj5-gautams-projects-b7eef1c8.vercel.app'
 ]);
 
 app.use(cors({
