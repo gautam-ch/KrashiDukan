@@ -9,26 +9,28 @@ export function ProductList({ products, onAddToCart }) {
   };
 
   return (
-    <div className="list">
+    <div className="list compact-list">
       {products.map((p) => (
-        <div key={p._id} className={`product-card ${expiryStatus(p)}`}>
-          <div className="row" style={{ justifyContent: "space-between" }}>
-            <strong>{p.title}</strong>
+        <div key={p._id} className={`product-card compact-card ${expiryStatus(p)}`}>
+          <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
+            <div className="stack" style={{ gap: 4 }}>
+              <strong className="product-title">{p.title}</strong>
+              <span className="muted" style={{ fontSize: 12 }}>{p.description}</span>
+            </div>
             <span className="tag">{p.category || "uncategorized"}</span>
           </div>
-          <p className="muted">{p.description}</p>
           <div className="row" style={{ justifyContent: "space-between" }}>
-            <span>Spray: {p.sprayCount || "-"}</span>
-            <span>Qty: {p.quantity}</span>
+            <span className="muted">Spray: {p.sprayCount || "-"}</span>
+            <span className="muted">Qty: {p.quantity}</span>
           </div>
-          <div className="row" style={{ justifyContent: "space-between" }}>
-            <span>Sell: {p.sellingPrice}</span>
+          <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+            <strong>₹{p.sellingPrice}</strong>
             <span className="muted">Expiry: {formatDate(p.expiryDate)}</span>
           </div>
           <div className="chip-row">
-            {(p.tags || []).map((t) => <span key={t} className="tag">{t}</span>)}
+            {(p.tags || []).slice(0, 2).map((t) => <span key={t} className="tag">{t}</span>)}
           </div>
-          <button onClick={() => onAddToCart?.(p)}>Add to cart</button>
+          <button className="btn-small" onClick={() => onAddToCart?.(p)}>Add to cart</button>
         </div>
       ))}
       {products.length === 0 && <p className="muted">No products found.</p>}

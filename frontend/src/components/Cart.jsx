@@ -1,10 +1,12 @@
-export function Cart({ items, onQtyChange, onRemove, total }) {
+export function Cart({ items, onQtyChange, onRemove, total, showHeader = true }) {
   return (
     <div className="card stack cart-card">
-      <div className="row" style={{ justifyContent: "space-between" }}>
-        <h3 style={{ margin: 0 }}>Cart</h3>
-        <span className="muted">{items.length} items</span>
-      </div>
+      {showHeader && (
+        <div className="row" style={{ justifyContent: "space-between" }}>
+          <h3 style={{ margin: 0 }}>Cart</h3>
+          <span className="muted">{items.length} items</span>
+        </div>
+      )}
       {items.length === 0 && <p className="muted">Add items from product list.</p>}
       {items.map((item) => (
         <div key={item.product._id} className="cart-item">

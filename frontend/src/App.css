@@ -100,6 +100,10 @@ button:hover:not(:disabled) {
 	gap: 12px;
 }
 
+.compact-list {
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
 .product-card {
 	border: 1px solid #111;
 	border-radius: 8px;
@@ -107,6 +111,20 @@ button:hover:not(:disabled) {
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
+}
+
+.compact-card {
+	padding: 10px;
+	gap: 6px;
+}
+
+.product-title {
+	font-size: 14px;
+}
+
+.btn-small {
+	padding: 6px 10px;
+	font-size: 13px;
 }
 
 .muted {

@@ -23,6 +23,7 @@ export function DashboardPage({
   const navigate = useNavigate();
   const [showOwnerModal, setShowOwnerModal] = useState(false);
   const [ownerEmail, setOwnerEmail] = useState("");
+  const [showCart, setShowCart] = useState(false);
   return (
     <div className="app-shell">
       <div className="header">
@@ -33,6 +34,7 @@ export function DashboardPage({
         <div className="row">
           <button className="ghost" onClick={() => navigate("/search")}>Search</button>
           <button className="ghost" onClick={() => navigate("/orders")}>Orders</button>
+          <button className="ghost" onClick={() => setShowCart(true)}>Cart ({cart.length})</button>
           <button className="ghost" onClick={() => setShowOwnerModal(true)}>Add owner</button>
           {onLogout && <button className="ghost" onClick={onLogout}>Logout</button>}
         </div>
@@ -45,12 +47,6 @@ export function DashboardPage({
 
 
       <div className="grid">
-        <Cart
-          items={cart}
-          onQtyChange={onCartQty}
-          onRemove={onCartRemove}
-          total={cartTotal}
-        />
         <OrderForm
           value={orderForm}
           onChange={onOrderChange}
@@ -58,6 +54,24 @@ export function DashboardPage({
           disabled={cart.length === 0}
         />
       </div>
+
+      {showCart && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true">
+          <div className="modal card stack" style={{ maxWidth: 520 }}>
+            <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+              <h3 style={{ margin: 0 }}>Cart</h3>
+              <button className="ghost" type="button" onClick={() => setShowCart(false)}>Close</button>
+            </div>
+            <Cart
+              items={cart}
+              onQtyChange={onCartQty}
+              onRemove={onCartRemove}
+              total={cartTotal}
+              showHeader={false}
+            />
+          </div>
+        </div>
+      )}
 
       {showOwnerModal && (
         <div className="modal-backdrop" role="dialog" aria-modal="true">
