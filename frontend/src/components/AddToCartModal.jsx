@@ -1,5 +1,8 @@
 export function AddToCartModal({ product, quantity, onQuantityChange, onClose, onConfirm }) {
   if (!product) return null;
+  const maxQty = Math.max(0, Number(product.quantity ?? 0));
+  const safeMax = Math.max(1, maxQty);
+  const safeQuantity = Math.min(Math.max(Number(quantity || 1), 1), safeMax);
 
   return (
     <div className="modal-backdrop" role="dialog" aria-modal="true">
@@ -23,14 +26,20 @@ export function AddToCartModal({ product, quantity, onQuantityChange, onClose, o
               className="compact-input"
               type="number"
               min={1}
-              value={quantity}
-              onChange={(e) => onQuantityChange?.(Number(e.target.value) || 1)}
+              max={safeMax}
+              value={safeQuantity}
+              onChange={(e) => {
+                const next = Math.min(Math.max(Number(e.target.value) || 1, 1), safeMax);
+                onQuantityChange?.(next);
+              }}
             />
           </label>
-          <button onClick={() => onConfirm?.(quantity)}>Add to cart</button>
+          <button onClick={() => onConfirm?.(safeQuantity)} disabled={maxQty <= 0}>
+            {maxQty <= 0 ? "Out of stock" : "Add to cart"}
+          </button>
         </div>
         <p className="muted" style={{ margin: 0 }}>
-          Total: ₹{Number(product.sellingPrice || 0) * Number(quantity || 1)}
+          Total: ₹{Number(product.sellingPrice || 0) * Number(safeQuantity || 1)}
         </p>
       </div>
     </div>

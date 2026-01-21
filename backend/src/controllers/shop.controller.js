@@ -1,6 +1,8 @@
 import { ApiError } from '../utils/ApiError.js'
 import { Shop } from '../models/shop.model.js';
 import { User } from '../models/user.model.js';
+import { Product } from '../models/product.model.js';
+import { Order } from '../models/order.model.js';
 import mongoose from 'mongoose';
 
 export const createShop = async (req, res) => {
@@ -117,4 +119,76 @@ export const getMyShop = async (req, res) => {
     if (!shop) throw new ApiError(404, "Shop not found for this user");
 
     res.status(200).json({ success: true, shop });
+}
+
+export const getShopAnalytics = async (req, res) => {
+    const ownerId = req.userId;
+    const { shopId } = req.params;
+
+    if (!ownerId) throw new ApiError(401, "Unauthorized user!");
+    if (!shopId) throw new ApiError(400, "Shop ID is required");
+
+    const shop = await Shop.findById(shopId);
+    if (!shop) throw new ApiError(404, "Shop not found for this user");
+
+    const isOwner = shop.owners.some((id) => id.toString() === ownerId);
+    if (!isOwner) throw new ApiError(403, "Forbidden");
+
+    const shopObjectId = new mongoose.Types.ObjectId(shopId);
+    const totalProducts = await Product.countDocuments({ shopId: shopObjectId });
+
+    const [orderSummary] = await Order.aggregate([
+        { $match: { shopId: shopObjectId } },
+        {
+            $group: {
+                _id: null,
+                totalSales: { $sum: { $ifNull: ["$totalAmount", 0] } },
+                totalOrders: { $sum: 1 },
+                averageOrderValue: { $avg: { $ifNull: ["$totalAmount", 0] } }
+            }
+        }
+    ]);
+
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+
+    const monthlySales = await Order.aggregate([
+        {
+            $match: {
+                shopId: shopObjectId,
+                createdAt: { $gte: start }
+            }
+        },
+        {
+            $group: {
+                _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+                total: { $sum: { $ifNull: ["$totalAmount", 0] } }
+            }
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1 } }
+    ]);
+
+    const monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const salesByMonth = [];
+
+    for (let i = 5; i >= 0; i -= 1) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const label = `${monthLabels[date.getMonth()]} ${String(year).slice(-2)}`;
+        const match = monthlySales.find((entry) => entry._id.year === year && entry._id.month === month);
+        salesByMonth.push({ label, total: match ? match.total : 0 });
+    }
+
+    res.status(200).json({
+        success: true,
+        shop: { _id: shop._id, name: shop.name },
+        metrics: {
+            totalProducts,
+            totalSales: orderSummary?.totalSales || 0,
+            totalOrders: orderSummary?.totalOrders || 0,
+            averageOrderValue: orderSummary?.averageOrderValue || 0,
+            salesByMonth
+        }
+    });
 }

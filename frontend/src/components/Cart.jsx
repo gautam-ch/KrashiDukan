@@ -19,6 +19,7 @@ export function Cart({ items, onQtyChange, onRemove, total, showHeader = true })
               className="cart-qty"
               type="number"
               min={1}
+              max={Number(item.product?.quantity ?? 0) || 1}
               value={item.quantity}
               onChange={(e) => onQtyChange?.(item.product._id, e.target.value)}
             />

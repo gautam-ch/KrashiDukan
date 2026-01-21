@@ -143,20 +143,45 @@ function App() {
 
   const addToCart = (product, quantity = 1) => {
     setCart((prev) => {
+      const available = Number(product?.quantity ?? 0);
+      if (available <= 0) {
+        toast.error("Product is out of stock");
+        return prev;
+      }
       const existing = prev.find((item) => item.product._id === product._id);
       if (existing) {
+        const desired = existing.quantity + Number(quantity || 1);
+        const nextQty = Math.min(desired, available);
+        if (desired > available) {
+          toast.error(`Only ${available} available for ${product.title}`);
+        }
         return prev.map((item) =>
-          item.product._id === product._id ? { ...item, quantity: item.quantity + quantity } : item
+          item.product._id === product._id ? { ...item, quantity: nextQty } : item
         );
       }
-      return [...prev, { product, quantity }];
+      const nextQty = Math.min(Number(quantity || 1), available);
+      if (nextQty < Number(quantity || 1)) {
+        toast.error(`Only ${available} available for ${product.title}`);
+      }
+      return [...prev, { product, quantity: nextQty }];
     });
   };
 
   const updateCartQuantity = (productId, quantity) => {
-    setCart((prev) => prev.map((item) =>
-      item.product._id === productId ? { ...item, quantity: Number(quantity) } : item
-    ));
+    setCart((prev) => prev.flatMap((item) => {
+      if (item.product._id !== productId) return [item];
+      const available = Number(item.product?.quantity ?? 0);
+      if (available <= 0) {
+        toast.error(`${item.product.title} is out of stock`);
+        return [];
+      }
+      const desired = Number(quantity);
+      const nextQty = Math.min(Math.max(Number.isFinite(desired) ? desired : 1, 1), available);
+      if (Number.isFinite(desired) && desired > available) {
+        toast.error(`Only ${available} available for ${item.product.title}`);
+      }
+      return [{ ...item, quantity: nextQty }];
+    }));
   };
 
   const removeFromCart = (productId) => {
@@ -243,17 +268,13 @@ function App() {
         <Route
           path="/"
           element={
-            authed && shop ? (
-              <Navigate to="/dashboard" />
-            ) : (
-              <HomePage
-                authed={authed}
-                shop={shop}
-                onCreateShop={(name) => handleCreateShop(name).then(() => navigate("/dashboard"))}
-                onAddOwner={handleAddOwner}
-                onLogout={handleLogout}
-              />
-            )
+            <HomePage
+              authed={authed}
+              shop={shop}
+              onCreateShop={(name) => handleCreateShop(name).then(() => navigate("/dashboard"))}
+              onAddOwner={handleAddOwner}
+              onLogout={handleLogout}
+            />
           }
         />
         <Route path="*" element={<Navigate to="/" />} />

@@ -89,7 +89,7 @@ export const getProducts= async(req,res)=>{
       });
 
       const [products, totalCount] = await Promise.all([
-            Product.find(query).sort({ expiryDate: -1, createdAt: -1 }).limit(limit).skip(offset),
+            Product.find(query).sort({ expiryDate:1}).limit(limit).skip(offset),
             Product.countDocuments(query),
       ]);
 
