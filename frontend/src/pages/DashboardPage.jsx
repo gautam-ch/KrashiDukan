@@ -46,18 +46,9 @@ export function DashboardPage({
       </div>
 
 
-      <div className="grid">
-        <OrderForm
-          value={orderForm}
-          onChange={onOrderChange}
-          onSubmit={onOrderSubmit}
-          disabled={cart.length === 0}
-        />
-      </div>
-
       {showCart && (
         <div className="modal-backdrop" role="dialog" aria-modal="true">
-          <div className="modal card stack" style={{ maxWidth: 520 }}>
+          <div className="modal card stack" style={{ maxWidth: 560 }}>
             <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
               <h3 style={{ margin: 0 }}>Cart</h3>
               <button className="ghost" type="button" onClick={() => setShowCart(false)}>Close</button>
@@ -68,6 +59,12 @@ export function DashboardPage({
               onRemove={onCartRemove}
               total={cartTotal}
               showHeader={false}
+            />
+            <OrderForm
+              value={orderForm}
+              onChange={onOrderChange}
+              onSubmit={onOrderSubmit}
+              disabled={cart.length === 0}
             />
           </div>
         </div>

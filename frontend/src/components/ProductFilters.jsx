@@ -20,11 +20,11 @@ export function ProductFilters({ filters, onChange, onExportCSV, onExportPDF, on
         <option value="">Any spray</option>
         {sprayCounts.map((s) => <option key={s} value={s}>{s}</option>)}
       </select>
-      {showSearchButton && <button onClick={onSearch}>Search</button>}
+      {showSearchButton && <button type="button" onClick={onSearch}>Search</button>}
       {showExports && (
         <div className="row">
-          <button className="ghost" onClick={onExportCSV}>Export CSV</button>
-          <button className="ghost" onClick={onExportPDF}>Export PDF</button>
+          <button type="button" className="ghost" onClick={onExportCSV}>Export CSV</button>
+          <button type="button" className="ghost" onClick={onExportPDF}>Export PDF</button>
         </div>
       )}
     </div>

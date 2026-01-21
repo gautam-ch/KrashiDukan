@@ -59,8 +59,9 @@ export function OrdersPage({ shopId, onLogout }) {
             value={searchDraft}
             onChange={(e) => setSearchDraft(e.target.value)}
           />
-          <button onClick={() => { setSearch(searchDraft.trim()); setPage(1); }}>Search</button>
+          <button type="button" onClick={() => { setSearch(searchDraft.trim()); setPage(1); }}>Search</button>
           <button
+            type="button"
             className="ghost"
             onClick={() => { setSearchDraft(""); setSearch(""); setPage(1); }}
           >

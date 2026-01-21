@@ -9,6 +9,7 @@ export function Pagination({ page, totalPages, onPageChange }) {
   return (
     <div className="pagination">
       <button
+        type="button"
         className="ghost"
         onClick={() => onPageChange?.(page - 1)}
         disabled={page <= 1}
@@ -18,6 +19,7 @@ export function Pagination({ page, totalPages, onPageChange }) {
       {pages.map((p) => (
         <button
           key={p}
+          type="button"
           className={p === page ? "active" : "ghost"}
           onClick={() => onPageChange?.(p)}
         >
@@ -25,6 +27,7 @@ export function Pagination({ page, totalPages, onPageChange }) {
         </button>
       ))}
       <button
+        type="button"
         className="ghost"
         onClick={() => onPageChange?.(page + 1)}
         disabled={page >= totalPages}

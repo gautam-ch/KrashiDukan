@@ -89,7 +89,7 @@ export const getProducts= async(req,res)=>{
       });
 
       const [products, totalCount] = await Promise.all([
-            Product.find(query).sort({ createdAt: -1 }).limit(limit).skip(offset),
+            Product.find(query).sort({ expiryDate: -1, createdAt: -1 }).limit(limit).skip(offset),
             Product.countDocuments(query),
       ]);
 
@@ -133,7 +133,7 @@ export const exportProductsCSV = async (req, res) => {
             sprayCount: req.query.sprayCount,
       });
 
-      const products = await Product.find(query).sort({ createdAt: -1 });
+      const products = await Product.find(query).sort({ expiryDate: -1, createdAt: -1 });
 
       const headers = ["title", "category", "sprayCount", "expiryDate", "quantity", "sellingPrice", "costPrice"];
       const rows = products.map((p) => ({
@@ -189,7 +189,7 @@ export const exportProductsPDF = async (req, res) => {
             sprayCount: req.query.sprayCount,
       });
 
-      const products = await Product.find(query).sort({ createdAt: -1 });
+      const products = await Product.find(query).sort({ expiryDate: -1, createdAt: -1 });
 
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader("Content-Disposition", "attachment; filename=products.pdf");
