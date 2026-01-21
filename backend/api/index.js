@@ -8,7 +8,9 @@ if (process.env.NODE_ENV !== 'production') {
 
 export default async function handler(req, res) {
   try {
-    await dbConnect();
+    if (req.method !== 'OPTIONS') {
+      await dbConnect();
+    }
     return app(req, res);
   } catch (error) {
     console.error('Serverless handler error', error);
