@@ -9,24 +9,8 @@ import orderRoute from './routes/order.route.js';
 
 export const app = express();
 
-const defaultOrigin = process.env.CLIENT_URL || 'http://localhost:5173';
-const allowedOrigins = new Set([
-      defaultOrigin,
-      'http://127.0.0.1:5173',
-      'http://localhost:5174',
-      'http://127.0.0.1:5174',
-      'https://krashi-dukan.vercel.app',
-      'https://krashi-dukan-73mwkanj5-gautams-projects-b7eef1c8.vercel.app'
-]);
-
 app.use(cors({
-      origin: (origin, callback) => {
-            if (!origin) return callback(null, true);
-            if (allowedOrigins.has(origin)) return callback(null, true);
-            if (/^http:\/\/localhost:\d+$/.test(origin)) return callback(null, true);
-            if (/^http:\/\/127\.0\.0\.1:\d+$/.test(origin)) return callback(null, true);
-            return callback(new Error('Not allowed by CORS'));
-      },
+      origin: '*',
       credentials: true,
 }));
 app.use(cookieParser());
