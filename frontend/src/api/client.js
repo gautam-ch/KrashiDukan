@@ -1,4 +1,5 @@
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3000";
+const API_BASE = import.meta.env.VITE_API_BASE
+  || `${window.location.protocol}//${window.location.hostname}:3000`;
 
 const fetchJSON = async (path, options = {}) => {
   const res = await fetch(`${API_BASE}${path}`, {
