@@ -9,10 +9,13 @@ import orderRoute from './routes/order.route.js';
 
 export const app = express();
 
-app.use(cors({
-      origin: '*',
+const corsOptions = {
+      origin: true,
       credentials: true,
-}));
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 
