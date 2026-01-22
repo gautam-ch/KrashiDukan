@@ -1,8 +1,12 @@
 {
   "rewrites": [
     {
+      "source": "/api/(.*)",
+      "destination": "https://krashi-dukan-s1vt.vercel.app/$1"
+    },
+    {
       "source": "/(.*)",
-      "destination": "/"
+      "destination": "/index.html"
     }
   ]
 }

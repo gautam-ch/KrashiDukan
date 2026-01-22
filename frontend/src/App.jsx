@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import "./App.css";
@@ -14,8 +14,6 @@ function App() {
   const [authed, setAuthed] = useState(false);
   const [shop, setShop] = useState(null);
   const [loaderCount, setLoaderCount] = useState(0);
-  const [clickLoading, setClickLoading] = useState(false);
-  const clickTimeoutRef = useRef(null);
 
   const [productForm, setProductForm] = useState({
     title: "",
@@ -71,28 +69,6 @@ function App() {
     };
   }, []);
 
-  useEffect(() => {
-    const handleClick = (event) => {
-      const button = event.target?.closest?.('button, [role="button"]');
-      if (!button || button.disabled) return;
-      setClickLoading(true);
-      if (clickTimeoutRef.current) {
-        clearTimeout(clickTimeoutRef.current);
-      }
-      clickTimeoutRef.current = setTimeout(() => {
-        setClickLoading(false);
-      }, 500);
-    };
-
-    document.addEventListener("click", handleClick, true);
-
-    return () => {
-      document.removeEventListener("click", handleClick, true);
-      if (clickTimeoutRef.current) {
-        clearTimeout(clickTimeoutRef.current);
-      }
-    };
-  }, []);
 
   const handleSignin = async (email, password, { silentToast } = {}) => {
     try {
@@ -231,7 +207,7 @@ function App() {
     return cart.reduce((sum, item) => sum + item.quantity * Number(item.product.sellingPrice || 0), 0);
   }, [cart]);
 
-  const isLoading = loaderCount > 0 || clickLoading;
+  const isLoading = loaderCount > 0;
 
   const handleCreateOrder = async () => {
     if (!shop?._id || cart.length === 0) return;
