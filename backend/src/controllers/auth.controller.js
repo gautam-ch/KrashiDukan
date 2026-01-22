@@ -43,13 +43,16 @@ export const signup = async (req, res) => {
 }
 
 const isProduction = process.env.NODE_ENV === "production";
-const cookieSameSite = process.env.COOKIE_SAMESITE || (isProduction ? "None" : "Lax");
-const cookieSecure = process.env.COOKIE_SECURE === "true" || cookieSameSite === "None";
+const cookieSameSite = process.env.COOKIE_SAMESITE ?? (isProduction ? "None" : "Lax");
+const cookieSecure = process.env.COOKIE_SECURE
+    ? process.env.COOKIE_SECURE === "true"
+    : cookieSameSite === "None" || isProduction;
 
 const cookieOpts = {
     httpOnly: true,
     secure: cookieSecure,
     sameSite: cookieSameSite,
+    path: "/",
 };
 
 export const login = async (req, res) => {
@@ -116,9 +119,9 @@ export const logout = async (req, res) => {
         await Session.deleteOne({ token: hashed });
     }
 
-    res.clearCookie("accessToken",cookieOpts);
+    res.clearCookie("accessToken", cookieOpts);
 
-    res.clearCookie("refreshToken",cookieOpts);
+    res.clearCookie("refreshToken", cookieOpts);
 
 
     res.status(200).json({ success: true, message: "User logged out successfully!" })
