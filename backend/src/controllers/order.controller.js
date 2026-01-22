@@ -124,10 +124,11 @@ export const createOrder = async(req,res)=>{
 export const  orderHistory = async(req,res)=>{
      const {Id} = req.params;
      if(!Id) throw new ApiError(400,"Shop ID is required to get order history");
-     
-     const page = Math.max(1, Number(req.query.page) || 1); 
-     const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 20)); // Default 20, max 50
-     const offset = (page - 1) * limit;
+
+    const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 20)); // Default 20, max 50
+    const cursor = req.query.cursor ? String(req.query.cursor) : null;
+    const cursorId = req.query.cursorId ? String(req.query.cursorId) : null;
+    const includeTotal = req.query.includeTotal === "true" || !cursor;
 
      const search = (req.query.search || "").trim();
      const query = { shopId: Id };
@@ -141,22 +142,53 @@ export const  orderHistory = async(req,res)=>{
          ];
      }
 
-     const [orders, totalCount] = await Promise.all([
-         Order.find(query).sort({createdAt:-1}).limit(limit).skip(offset),
-         Order.countDocuments(query)
-     ]);
+     let pagedQuery = query;
+     let cursorDate = null;
 
-     const totalPages = Math.ceil(totalCount / limit);
+     if (cursor && cursorId) {
+         if (!mongoose.Types.ObjectId.isValid(cursorId)) {
+             throw new ApiError(400, "Invalid cursor id");
+         }
+         cursorDate = new Date(cursor);
+         if (Number.isNaN(cursorDate.getTime())) {
+             throw new ApiError(400, "Invalid cursor date");
+         }
+         const keysetFilter = {
+             $or: [
+                 { createdAt: { $lt: cursorDate } },
+                 { createdAt: cursorDate, _id: { $lt: cursorId } }
+             ]
+         };
+         pagedQuery = { $and: [query, keysetFilter] };
+     }
+
+     const orders = await Order.find(pagedQuery)
+         .sort({ createdAt: -1, _id: -1 })
+         .limit(limit + 1);
+
+     const hasNextPage = orders.length > limit;
+     const items = hasNextPage ? orders.slice(0, limit) : orders;
+     const lastItem = items[items.length - 1];
+     const nextCursor = hasNextPage && lastItem
+         ? {
+             cursor: lastItem.createdAt?.toISOString(),
+             cursorId: lastItem._id.toString()
+         }
+         : null;
+
+     const pagination = {
+         limit,
+         hasNextPage,
+         nextCursor,
+     };
+
+     if (includeTotal) {
+         const totalCount = await Order.countDocuments(query);
+         pagination.totalCount = totalCount;
+     }
      
      res.status(200).json({
-         orders,
-         pagination: {
-             currentPage: page,
-             totalPages,
-             totalCount,
-             limit,
-             hasNextPage: page < totalPages,
-             hasPrevPage: page > 1
-         }
+         orders: items,
+         pagination
      });
 }

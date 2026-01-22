@@ -2,6 +2,7 @@ import {Shop} from '../models/shop.model.js';
 import { Product } from '../models/product.model.js';
 import {ApiError} from "../utils/ApiError.js"
 import PDFDocument from "pdfkit";
+import mongoose from "mongoose";
 
 const buildProductQuery = ({ shopId, search, category, sprayCount }) => {
       const query = { shopId };
@@ -77,9 +78,10 @@ export const getProducts= async(req,res)=>{
         );
       if(!isOwner) throw new ApiError(403,"Forbidden");
 
-      const page = Math.max(1, Number(req.query.page) || 1);
       const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 20));
-      const offset = (page - 1) * limit;
+      const cursor = req.query.cursor ? String(req.query.cursor) : null;
+      const cursorId = req.query.cursorId ? String(req.query.cursorId) : null;
+      const includeTotal = req.query.includeTotal === "true" || !cursor;
 
       const query = buildProductQuery({
             shopId,
@@ -87,25 +89,55 @@ export const getProducts= async(req,res)=>{
             category: req.query.category,
             sprayCount: req.query.sprayCount,
       });
+      let pagedQuery = query;
+      let cursorDate = null;
 
-      const [products, totalCount] = await Promise.all([
-            Product.find(query).sort({ expiryDate:1}).limit(limit).skip(offset),
-            Product.countDocuments(query),
-      ]);
+      if (cursor && cursorId) {
+            if (!mongoose.Types.ObjectId.isValid(cursorId)) {
+                  throw new ApiError(400, "Invalid cursor id");
+            }
+            cursorDate = new Date(cursor);
+            if (Number.isNaN(cursorDate.getTime())) {
+                  throw new ApiError(400, "Invalid cursor date");
+            }
+            const keysetFilter = {
+                  $or: [
+                        { expiryDate: { $gt: cursorDate } },
+                        { expiryDate: cursorDate, _id: { $gt: cursorId } }
+                  ]
+            };
+            pagedQuery = { $and: [query, keysetFilter] };
+      }
 
-      const totalPages = Math.ceil(totalCount / limit);
+      const products = await Product.find(pagedQuery)
+            .sort({ expiryDate: 1, _id: 1 })
+            .limit(limit + 1);
+
+      const hasNextPage = products.length > limit;
+      const items = hasNextPage ? products.slice(0, limit) : products;
+      const lastItem = items[items.length - 1];
+      const nextCursor = hasNextPage && lastItem
+            ? {
+                  cursor: lastItem.expiryDate?.toISOString(),
+                  cursorId: lastItem._id.toString()
+            }
+            : null;
+
+      const pagination = {
+            limit,
+            hasNextPage,
+            nextCursor,
+      };
+
+      if (includeTotal) {
+            const totalCount = await Product.countDocuments(query);
+            pagination.totalCount = totalCount;
+      }
 
       res.status(200).json({
         success:true,
-        products,
-        pagination: {
-            currentPage: page,
-            totalPages,
-            totalCount,
-            limit,
-            hasNextPage: page < totalPages,
-            hasPrevPage: page > 1,
-        },
+        products: items,
+        pagination,
         message:"fetched products successfully"
       })
 

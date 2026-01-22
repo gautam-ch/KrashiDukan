@@ -47,5 +47,6 @@ const productSchema = new Schema({
 })
 
 productSchema.index({ shopId: 1,category: 1, sprayCount: 1 });
+productSchema.index({ shopId: 1, expiryDate: 1, _id: 1 });
 
 export const Product = mongoose.model("Product",productSchema);

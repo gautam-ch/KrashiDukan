@@ -51,5 +51,6 @@ const orderSchema = new Schema({
 })
 
 orderSchema.index({shopId:1});
+orderSchema.index({ shopId: 1, createdAt: -1, _id: -1 });
 
 export const Order = mongoose.model("Order", orderSchema);

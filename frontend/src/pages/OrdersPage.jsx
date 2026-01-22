@@ -11,17 +11,32 @@ export function OrdersPage({ shopId, onLogout }) {
   const [search, setSearch] = useState("");
   const [orders, setOrders] = useState([]);
   const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, totalCount: 0, limit: 20 });
+  const [pagination, setPagination] = useState({ nextCursor: null, hasNextPage: false, totalCount: 0, limit: 20 });
+  const [cursorStack, setCursorStack] = useState([]);
+  const [activeCursor, setActiveCursor] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
-  const loadOrders = useCallback(async ({ nextPage = 1, nextSearch = search } = {}) => {
+  const loadOrders = useCallback(async ({ cursor = null, nextSearch = search, includeTotal = false } = {}) => {
     if (!shopId) return;
     setLoading(true);
     try {
-      const data = await api.getOrders(shopId, { page: nextPage, limit: 20, search: nextSearch });
+      const params = { limit: 20, search: nextSearch };
+      if (cursor?.cursor && cursor?.cursorId) {
+        params.cursor = cursor.cursor;
+        params.cursorId = cursor.cursorId;
+      }
+      if (includeTotal) {
+        params.includeTotal = true;
+      }
+      const data = await api.getOrders(shopId, params);
       setOrders(data.orders || []);
-      setPagination(data.pagination || { currentPage: nextPage, totalPages: 1, totalCount: 0, limit: 20 });
+      setPagination((prev) => ({
+        limit: data.pagination?.limit ?? prev.limit,
+        hasNextPage: Boolean(data.pagination?.hasNextPage),
+        nextCursor: data.pagination?.nextCursor ?? null,
+        totalCount: data.pagination?.totalCount ?? prev.totalCount,
+      }));
     } catch (err) {
       toast.error(err?.message || "Could not load orders");
     } finally {
@@ -30,8 +45,26 @@ export function OrdersPage({ shopId, onLogout }) {
   }, [shopId, search]);
 
   useEffect(() => {
-    loadOrders({ nextPage: page, nextSearch: search });
-  }, [page, search, loadOrders]);
+    loadOrders({ cursor: activeCursor, nextSearch: search, includeTotal: !activeCursor });
+  }, [activeCursor, search, loadOrders]);
+
+  const handleNext = () => {
+    if (!pagination?.nextCursor) return;
+    setCursorStack((prev) => [...prev, activeCursor]);
+    setActiveCursor(pagination.nextCursor);
+    setPage((prev) => prev + 1);
+  };
+
+  const handlePrev = () => {
+    setCursorStack((prev) => {
+      if (prev.length === 0) return prev;
+      const nextStack = [...prev];
+      const prevCursor = nextStack.pop();
+      setActiveCursor(prevCursor || null);
+      setPage((prevPage) => Math.max(1, prevPage - 1));
+      return nextStack;
+    });
+  };
 
   return (
     <div className="app-shell">
@@ -79,11 +112,27 @@ export function OrdersPage({ shopId, onLogout }) {
             value={searchDraft}
             onChange={(e) => setSearchDraft(e.target.value)}
           />
-          <button type="button" onClick={() => { setSearch(searchDraft.trim()); setPage(1); }}>Search</button>
+          <button
+            type="button"
+            onClick={() => {
+              setSearch(searchDraft.trim());
+              setPage(1);
+              setActiveCursor(null);
+              setCursorStack([]);
+            }}
+          >
+            Search
+          </button>
           <button
             type="button"
             className="ghost"
-            onClick={() => { setSearchDraft(""); setSearch(""); setPage(1); }}
+            onClick={() => {
+              setSearchDraft("");
+              setSearch("");
+              setPage(1);
+              setActiveCursor(null);
+              setCursorStack([]);
+            }}
           >
             Clear
           </button>
@@ -93,9 +142,11 @@ export function OrdersPage({ shopId, onLogout }) {
       {loading ? <p className="muted">Loading orders...</p> : <OrderHistory orders={orders} />}
 
       <Pagination
-        page={pagination.currentPage || page}
-        totalPages={pagination.totalPages || 1}
-        onPageChange={setPage}
+        page={page}
+        hasNext={pagination.hasNextPage}
+        hasPrev={cursorStack.length > 0}
+        onNext={handleNext}
+        onPrev={handlePrev}
       />
     </div>
   );

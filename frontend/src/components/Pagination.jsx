@@ -1,4 +1,39 @@
-export function Pagination({ page, totalPages, onPageChange }) {
+export function Pagination({
+  page,
+  totalPages,
+  onPageChange,
+  hasNext,
+  hasPrev,
+  onNext,
+  onPrev,
+}) {
+  const useKeyset = totalPages === undefined || totalPages === null;
+
+  if (useKeyset) {
+    if (!hasNext && !hasPrev) return null;
+    return (
+      <div className="pagination">
+        <button
+          type="button"
+          className="ghost"
+          onClick={() => onPrev?.()}
+          disabled={!hasPrev}
+        >
+          Prev
+        </button>
+        <span className="muted" style={{ padding: "0 12px" }}>Page {page}</span>
+        <button
+          type="button"
+          className="ghost"
+          onClick={() => onNext?.()}
+          disabled={!hasNext}
+        >
+          Next
+        </button>
+      </div>
+    );
+  }
+
   if (!totalPages || totalPages <= 1) return null;
 
   const maxButtons = 5;
