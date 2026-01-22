@@ -42,10 +42,14 @@ export const signup = async (req, res) => {
 
 }
 
+const isProduction = process.env.NODE_ENV === "production";
+const cookieSameSite = process.env.COOKIE_SAMESITE || (isProduction ? "None" : "Lax");
+const cookieSecure = process.env.COOKIE_SECURE === "true" || cookieSameSite === "None";
+
 const cookieOpts = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite:  process.env.NODE_ENV === "production" ? "None" : "Lax",
+    secure: cookieSecure,
+    sameSite: cookieSameSite,
 };
 
 export const login = async (req, res) => {
