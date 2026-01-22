@@ -1,38 +1,53 @@
 const API_BASE = import.meta.env.VITE_API_BASE
   || `${window.location.protocol}//${window.location.hostname}:3000`;
 
+const notifyLoader = (eventName) => {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent(eventName));
+};
+
 const fetchJSON = async (path, options = {}) => {
-  const res = await fetch(`${API_BASE}${path}`, {
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {}),
-    },
-    ...options,
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const message = data?.message || "Request failed";
-    const error = new Error(message);
-    error.status = res.status;
-    throw error;
+  notifyLoader("global-loader:begin");
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+      },
+      ...options,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const message = data?.message || "Request failed";
+      const error = new Error(message);
+      error.status = res.status;
+      throw error;
+    }
+    return data;
+  } finally {
+    notifyLoader("global-loader:end");
   }
-  return data;
 };
 
 const fetchBlob = async (path, options = {}) => {
-  const res = await fetch(`${API_BASE}${path}`, {
-    credentials: "include",
-    ...(options || {}),
-  });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    const message = data?.message || "Request failed";
-    const error = new Error(message);
-    error.status = res.status;
-    throw error;
+  notifyLoader("global-loader:begin");
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      credentials: "include",
+      ...(options || {}),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      const message = data?.message || "Request failed";
+      const error = new Error(message);
+      error.status = res.status;
+      throw error;
+    }
+    return res.blob();
+  } finally {
+    notifyLoader("global-loader:end");
   }
-  return res.blob();
 };
 
 const buildQuery = (params = {}) => {

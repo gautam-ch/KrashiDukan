@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import "./App.css";
@@ -13,6 +13,9 @@ function App() {
   const navigate = useNavigate();
   const [authed, setAuthed] = useState(false);
   const [shop, setShop] = useState(null);
+  const [loaderCount, setLoaderCount] = useState(0);
+  const [clickLoading, setClickLoading] = useState(false);
+  const clickTimeoutRef = useRef(null);
 
   const [productForm, setProductForm] = useState({
     title: "",
@@ -53,6 +56,42 @@ function App() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     bootstrap();
+  }, []);
+
+  useEffect(() => {
+    const handleBegin = () => setLoaderCount((count) => count + 1);
+    const handleEnd = () => setLoaderCount((count) => Math.max(0, count - 1));
+
+    window.addEventListener("global-loader:begin", handleBegin);
+    window.addEventListener("global-loader:end", handleEnd);
+
+    return () => {
+      window.removeEventListener("global-loader:begin", handleBegin);
+      window.removeEventListener("global-loader:end", handleEnd);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleClick = (event) => {
+      const button = event.target?.closest?.('button, [role="button"]');
+      if (!button || button.disabled) return;
+      setClickLoading(true);
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+      }
+      clickTimeoutRef.current = setTimeout(() => {
+        setClickLoading(false);
+      }, 500);
+    };
+
+    document.addEventListener("click", handleClick, true);
+
+    return () => {
+      document.removeEventListener("click", handleClick, true);
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+      }
+    };
   }, []);
 
   const handleSignin = async (email, password, { silentToast } = {}) => {
@@ -192,6 +231,8 @@ function App() {
     return cart.reduce((sum, item) => sum + item.quantity * Number(item.product.sellingPrice || 0), 0);
   }, [cart]);
 
+  const isLoading = loaderCount > 0 || clickLoading;
+
   const handleCreateOrder = async () => {
     if (!shop?._id || cart.length === 0) return;
     try {
@@ -240,6 +281,13 @@ function App() {
   return (
     <>
       <Toaster position="top-right" />
+      <div className={`global-loader ${isLoading ? "visible" : ""}`} aria-hidden={!isLoading}>
+        <div className="global-loader__backdrop" />
+        <div className="global-loader__content" role="status" aria-live="polite">
+          <span className="global-loader__spinner" />
+          <span>Working…</span>
+        </div>
+      </div>
       <Routes>
         <Route
           path="/auth"

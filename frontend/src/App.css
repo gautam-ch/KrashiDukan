@@ -131,6 +131,58 @@ button:hover:not(:disabled) {
 	box-shadow: 2px 2px 0 #111;
 }
 
+.global-loader {
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 160ms ease;
+	z-index: 1000;
+}
+
+.global-loader.visible {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.global-loader__backdrop {
+	position: absolute;
+	inset: 0;
+	background: rgba(255, 255, 255, 0.6);
+	backdrop-filter: blur(2px);
+}
+
+.global-loader__content {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: #fff;
+	border: 1px solid #111;
+	border-radius: 14px;
+	box-shadow: 4px 4px 0 #111;
+	padding: 14px 18px;
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	font-weight: 600;
+}
+
+.global-loader__spinner {
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	border: 3px solid #111;
+	border-top-color: transparent;
+	animation: global-loader-spin 700ms linear infinite;
+}
+
+@keyframes global-loader-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
 .list {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
