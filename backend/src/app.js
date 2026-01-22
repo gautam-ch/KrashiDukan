@@ -10,7 +10,7 @@ import orderRoute from './routes/order.route.js';
 export const app = express();
 
 const corsOptions = {
-      origin: true,
+      origin: "https://krashi-dukan.vercel.app",
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
