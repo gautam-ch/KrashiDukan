@@ -17,10 +17,12 @@ function App() {
 
   const [productForm, setProductForm] = useState({
     title: "",
-    description: "",
+    contents: "",
     img: "",
     category: "",
+    customCategory: "",
     sprayCount: 5,
+    seedTreatment: "",
     costPrice: "",
     sellingPrice: "",
     tags: "",
@@ -128,8 +130,12 @@ function App() {
   const handleAddProduct = async () => {
     if (!shop?._id) return;
     try {
+      const resolvedCategory = productForm.category === "other"
+        ? (productForm.customCategory || "").trim()
+        : productForm.category;
       const payload = {
         ...productForm,
+        category: resolvedCategory,
         sprayCount: Number(productForm.sprayCount),
         sellingPrice: Number(productForm.sellingPrice),
         quantity: Number(productForm.quantity),
@@ -140,10 +146,12 @@ function App() {
       await api.addProduct(shop._id, payload);
       setProductForm({
         title: "",
-        description: "",
+        contents: "",
         img: "",
         category: "",
+        customCategory: "",
         sprayCount: 5,
+        seedTreatment: "",
         costPrice: "",
         sellingPrice: "",
         tags: "",

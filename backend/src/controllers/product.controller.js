@@ -19,7 +19,11 @@ const buildProductQuery = ({ shopId, search, category, sprayCount }) => {
             const regex = new RegExp(search, "i");
             query.$or = [
                   { title: regex },
-                  { description: regex }
+                  { contents: regex },
+                  { description: regex },
+                  { category: regex },
+                  { seedTreatment: regex },
+                  { tags: regex }
             ];
       }
 
@@ -44,14 +48,26 @@ export const addProduct =async(req,res)=>{
 
       const details=req.body;
 
+      if (!details?.contents && details?.description) {
+            details.contents = details.description;
+      }
+
       const errors={};
 
       if(!details?.title) errors.title="Title of product is required !";
-      if(!details?.description) errors.description="Description of product is required !";
+      if(!details?.contents) errors.contents="Contents of product is required !";
+      if(!details?.seedTreatment) errors.seedTreatment="Seed treatment is required !";
+      if(!details?.category) errors.category="Category of product is required !";
+      if(details?.sprayCount === undefined || details?.sprayCount === null || details?.sprayCount === "") {
+            errors.sprayCount="Spray count of product is required !";
+      }
       if(!details?.costPrice) errors.costPrice="Cost Price  of product is required !";
       if(!details?.sellingPrice) errors.sellingPrice="Selling Price of product is required !";
       if(!details?.expiryDate) errors.expiryDate="Expiry date of product is required !";
       if(!details?.quantity) errors.quantity="Quantity of product is required !";
+      if(!details?.tags || (Array.isArray(details.tags) && details.tags.length === 0)) {
+            errors.tags="Specifications are required !";
+      }
 
       if(Object.keys(errors).length>0) throw new ApiError(400,"All fields are required!",errors);
 

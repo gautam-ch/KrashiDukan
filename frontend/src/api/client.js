@@ -120,7 +120,7 @@ export const api = {
   exportProductsPDF: (shopId, params = {}) => fetchBlob(`/shops/${shopId}/products/export/pdf${buildQuery(params)}`),
 };
 
-export const formatDate = (dateString) => new Date(dateString).toLocaleDateString();
+export const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-GB");
 
 export const monthsUntil = (dateString) => {
   const now = new Date();

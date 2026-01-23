@@ -14,7 +14,7 @@ export function AddToCartModal({ product, quantity, onQuantityChange, onClose, o
           </div>
           <button className="ghost" type="button" onClick={onClose}>Close</button>
         </div>
-        <p className="muted" style={{ margin: 0 }}>{product.description}</p>
+        <p className="muted" style={{ margin: 0 }}>{product.contents ?? product.description}</p>
         <div className="row" style={{ justifyContent: "space-between" }}>
           <span className="tag">{product.category || "uncategorized"}</span>
           <strong>₹{product.sellingPrice}</strong>

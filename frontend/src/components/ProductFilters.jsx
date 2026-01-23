@@ -5,6 +5,11 @@ const categories = [
   "insecticide (chewing)",
   "pesticide",
   "fungicide",
+  "chipko",
+  "tonic",
+  "fungicide+Insecticide",
+  "insecticide(sucking+chewing)",
+   "herbicide",
 ];
 
 export function ProductFilters({ filters, onChange, onExportCSV, onExportPDF, onSearch, showSearchButton = false, showExports = true }) {

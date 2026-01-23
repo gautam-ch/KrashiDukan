@@ -23,8 +23,8 @@ export function ProductList({ products, onAddToCart }) {
             <span className="tag">{p.category || "uncategorized"}</span>
           </div>
           
-          {/* Description */}
-          <p className="card-description">{p.description}</p>
+          {/* Contents */}
+          <p className="card-description">{p.contents ?? p.description}</p>
           
           {/* Product Details */}
           <div className="card-details">
@@ -36,9 +36,19 @@ export function ProductList({ products, onAddToCart }) {
               <span className="detail-label">Spray Count</span>
               <span className="detail-value">{p.sprayCount || "-"}</span>
             </div>
+            {p.seedTreatment && (
+              <div className="detail-item">
+                <span className="detail-label">Seed Treatment</span>
+                <span className="detail-value">{p.seedTreatment}</span>
+              </div>
+            )}
             <div className="detail-item">
               <span className="detail-label">Expiry</span>
-              <span className="detail-value">{formatDate(p.expiryDate)}</span>
+              <span className="detail-value" style={{ fontSize: "1.05rem" }}><strong>{formatDate(p.expiryDate)}</strong></span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Cost Price</span>
+              <span className="detail-value">₹{p.costPrice}</span>
             </div>
           </div>
           

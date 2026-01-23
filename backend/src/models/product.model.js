@@ -6,7 +6,11 @@ const productSchema = new Schema({
         type:String,
         required:true
     },
-    description:{
+    contents:{
+        type:String,
+        required:true
+    },
+    seedTreatment:{
         type:String,
         required:true
     },
@@ -14,10 +18,12 @@ const productSchema = new Schema({
         type:String,
     },
     category:{
-        type:String
+        type:String,
+        required:true
     },
     sprayCount:{
        type:Number,
+       required:true
     },
     costPrice:{
         type:String,
@@ -29,6 +35,7 @@ const productSchema = new Schema({
     },
     tags:{
         type:[String],
+        required:true,
     },
     expiryDate:{
         type:Date,
