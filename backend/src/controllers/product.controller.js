@@ -22,7 +22,6 @@ const buildProductQuery = ({ shopId, search, category, sprayCount }) => {
                   { contents: regex },
                   { description: regex },
                   { category: regex },
-                  { seedTreatment: regex },
                   { tags: regex }
             ];
       }
@@ -56,7 +55,6 @@ export const addProduct =async(req,res)=>{
 
       if(!details?.title) errors.title="Title of product is required !";
       if(!details?.contents) errors.contents="Contents of product is required !";
-      if(!details?.seedTreatment) errors.seedTreatment="Seed treatment is required !";
       if(!details?.category) errors.category="Category of product is required !";
       if(details?.sprayCount === undefined || details?.sprayCount === null || details?.sprayCount === "") {
             errors.sprayCount="Spray count of product is required !";

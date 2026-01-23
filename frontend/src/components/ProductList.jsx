@@ -36,12 +36,6 @@ export function ProductList({ products, onAddToCart }) {
               <span className="detail-label">Spray Count</span>
               <span className="detail-value">{p.sprayCount || "-"}</span>
             </div>
-            {p.seedTreatment && (
-              <div className="detail-item">
-                <span className="detail-label">Seed Treatment</span>
-                <span className="detail-value">{p.seedTreatment}</span>
-              </div>
-            )}
             <div className="detail-item">
               <span className="detail-label">Expiry</span>
               <span className="detail-value" style={{ fontSize: "1.05rem" }}><strong>{formatDate(p.expiryDate)}</strong></span>

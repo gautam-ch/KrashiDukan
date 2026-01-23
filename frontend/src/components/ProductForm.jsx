@@ -41,9 +41,6 @@ export function ProductForm({ value, onChange, onSubmit }) {
             <input value={value.customCategory} onChange={(e) => update("customCategory", e.target.value)} required />
           </label>
         )}
-        <label>Seed treatment
-          <input value={value.seedTreatment} onChange={(e) => update("seedTreatment", e.target.value)} required />
-        </label>
         <div className="row">
           <label style={{ flex: 1 }}>Cost price (text)
             <input value={value.costPrice} onChange={(e) => update("costPrice", e.target.value)} required />

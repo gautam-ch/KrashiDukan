@@ -33,7 +33,6 @@ const buildProducts = (count = 100) => {
     products.push({
       title: `${category} product ${i}`,
       contents: `Sample ${category} product ${i} for demo seeding`,
-      seedTreatment: `Treatment ${i % 4 + 1}`,
       category,
       sprayCount,
       costPrice: String(cost),
