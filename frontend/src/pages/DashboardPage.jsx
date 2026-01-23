@@ -35,14 +35,18 @@ export function DashboardPage({
     return salesByMonth.reduce((max, item) => Math.max(max, item.total), 0) || 1;
   }, [salesByMonth]);
 
-  useEffect(() => {
+  const fetchAnalytics = (refresh = false) => {
     if (!shop?._id) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoadingAnalytics(true);
-    api.getShopAnalytics(shop._id)
+    api.getShopAnalytics(shop._id, refresh ? { refresh: true } : {})
       .then((data) => setAnalytics(data))
       .catch((err) => toast.error(err?.message || "Could not load analytics"))
       .finally(() => setLoadingAnalytics(false));
+  };
+
+  useEffect(() => {
+    fetchAnalytics(false);
   }, [shop?._id]);
   return (
     <div className="app-shell">
@@ -91,7 +95,12 @@ export function DashboardPage({
             <h3 style={{ margin: 0 }}>Analytics overview</h3>
             <p className="muted" style={{ margin: 0 }}>Full analytics snapshot for your shop.</p>
           </div>
-          <span className="pill">{shop?.name}</span>
+          <div className="row" style={{ gap: 8, alignItems: "center" }}>
+            <button className="ghost" onClick={() => fetchAnalytics(true)} disabled={loadingAnalytics}>
+              {loadingAnalytics ? "Refreshing..." : "Refresh"}
+            </button>
+            <span className="pill">{shop?.name}</span>
+          </div>
         </div>
         {loadingAnalytics ? (
           <p className="muted">Loading analytics...</p>

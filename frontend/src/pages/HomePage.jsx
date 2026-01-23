@@ -45,13 +45,17 @@ export function HomePage({ authed, shop, onCreateShop, onLogout }) {
     }
   };
 
-  useEffect(() => {
+  const fetchAnalytics = (refresh = false) => {
     if (!authed || !shop?._id) return;
     setLoadingAnalytics(true);
-    api.getShopAnalytics(shop._id)
+    api.getShopAnalytics(shop._id, refresh ? { refresh: true } : {})
       .then((data) => setAnalytics(data))
       .catch((err) => toast.error(err?.message || "Could not load analytics"))
       .finally(() => setLoadingAnalytics(false));
+  };
+
+  useEffect(() => {
+    fetchAnalytics(false);
   }, [authed, shop?._id]);
 
   return (
@@ -132,7 +136,12 @@ export function HomePage({ authed, shop, onCreateShop, onLogout }) {
               <h2 style={{ margin: 0 }}>{shop.name}</h2>
               <p className="muted" style={{ margin: 0 }}>Shop summary and recent sales.</p>
             </div>
-            <button onClick={() => navigate("/dashboard")}>Open full analytics</button>
+            <div className="row" style={{ gap: 8 }}>
+              <button className="ghost" onClick={() => fetchAnalytics(true)} disabled={loadingAnalytics}>
+                {loadingAnalytics ? "Refreshing..." : "Refresh"}
+              </button>
+              <button onClick={() => navigate("/dashboard")}>Open full analytics</button>
+            </div>
           </div>
           {loadingAnalytics ? (
             <p className="muted">Loading analytics...</p>

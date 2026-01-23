@@ -5,6 +5,28 @@ import { Product } from '../models/product.model.js';
 import { Order } from '../models/order.model.js';
 import mongoose from 'mongoose';
 
+const analyticsCache = globalThis.analyticsCache || new Map();
+globalThis.analyticsCache = analyticsCache;
+const ANALYTICS_CACHE_TTL_MS = Number(process.env.ANALYTICS_CACHE_TTL_MS || 60_0000);
+
+const getCachedAnalytics = (cacheKey) => {
+    const cached = analyticsCache.get(cacheKey);
+    if (!cached) return null;
+    if (cached.expiresAt <= Date.now()) {
+        analyticsCache.delete(cacheKey);
+        return null;
+    }
+    return cached.payload;
+};
+
+const setCachedAnalytics = (cacheKey, payload) => {
+    if (ANALYTICS_CACHE_TTL_MS <= 0) return;
+    analyticsCache.set(cacheKey, {
+        expiresAt: Date.now() + ANALYTICS_CACHE_TTL_MS,
+        payload
+    });
+};
+
 export const createShop = async (req, res) => {
     const userId = req.userId;
     const { name } = req.body;
@@ -124,6 +146,7 @@ export const getMyShop = async (req, res) => {
 export const getShopAnalytics = async (req, res) => {
     const ownerId = req.userId;
     const { shopId } = req.params;
+    const { refresh } = req.query;
 
     if (!ownerId) throw new ApiError(401, "Unauthorized user!");
     if (!shopId) throw new ApiError(400, "Shop ID is required");
@@ -133,6 +156,26 @@ export const getShopAnalytics = async (req, res) => {
 
     const isOwner = shop.owners.some((id) => id.toString() === ownerId);
     if (!isOwner) throw new ApiError(403, "Forbidden");
+
+    const cacheKey = `shop-analytics:${shopId}`;
+    const shouldRefresh = String(refresh).toLowerCase() === 'true';
+    if (shouldRefresh) {
+        analyticsCache.delete(cacheKey);
+        res.set('X-Cache', 'BYPASS');
+    }
+
+    if (ANALYTICS_CACHE_TTL_MS > 0 && !shouldRefresh) {
+        const cached = getCachedAnalytics(cacheKey);
+        if (cached) {
+            res.set('X-Cache', 'HIT');
+            res.set('Cache-Control', `private, max-age=${Math.floor(ANALYTICS_CACHE_TTL_MS / 1000)}`);
+            return res.status(200).json(cached);
+        }
+    }
+
+    if (!shouldRefresh) {
+        res.set('X-Cache', 'MISS');
+    }
 
     const shopObjectId = new mongoose.Types.ObjectId(shopId);
     const totalProducts = await Product.countDocuments({ shopId: shopObjectId });
@@ -180,7 +223,7 @@ export const getShopAnalytics = async (req, res) => {
         salesByMonth.push({ label, total: match ? match.total : 0 });
     }
 
-    res.status(200).json({
+    const payload = {
         success: true,
         shop: { _id: shop._id, name: shop.name },
         metrics: {
@@ -190,5 +233,11 @@ export const getShopAnalytics = async (req, res) => {
             averageOrderValue: orderSummary?.averageOrderValue || 0,
             salesByMonth
         }
-    });
+    };
+
+    setCachedAnalytics(cacheKey, payload);
+    if (ANALYTICS_CACHE_TTL_MS > 0) {
+        res.set('Cache-Control', `private, max-age=${Math.floor(ANALYTICS_CACHE_TTL_MS / 1000)}`);
+    }
+    res.status(200).json(payload);
 }
