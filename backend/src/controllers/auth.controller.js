@@ -5,6 +5,11 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import Session from "../models/session.model.js";
 import { Shop } from "../models/shop.model.js";
+import {
+    ACCESS_TOKEN_TTL_MS,
+    REFRESH_TOKEN_TTL_MS,
+    cookieOpts
+} from "../utils/authCookies.js";
 
 
 export const signup = async (req, res) => {
@@ -42,19 +47,6 @@ export const signup = async (req, res) => {
 
 }
 
-const isProduction = process.env.NODE_ENV === "production";
-const cookieSameSite = process.env.COOKIE_SAMESITE ?? (isProduction ? "None" : "Lax");
-const cookieSecure = process.env.COOKIE_SECURE
-    ? process.env.COOKIE_SECURE === "true"
-    : cookieSameSite === "None" || isProduction;
-
-const cookieOpts = {
-    httpOnly: true,
-    secure: cookieSecure,
-    sameSite: cookieSameSite,
-    path: "/",
-};
-
 export const login = async (req, res) => {
     const { email, password } = req.body;
 
@@ -84,7 +76,7 @@ export const login = async (req, res) => {
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '30m' });
 
     res.cookie('accessToken', token, {
-        ...cookieOpts, maxAge: 30 * 60 * 1000 //30min 
+        ...cookieOpts, maxAge: ACCESS_TOKEN_TTL_MS //30min 
     })
 
     //Refresh token
@@ -96,12 +88,12 @@ export const login = async (req, res) => {
     await Session.create({
         userId: user._id,
         token: hashed,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+        expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL_MS)
     })
 
     res.cookie('refreshToken', refreshToken, {
         ...cookieOpts,
-        maxAge: 30 * 24 * 60 * 60 * 1000 //30Day
+        maxAge: REFRESH_TOKEN_TTL_MS //30Day
     })
 
 
@@ -152,7 +144,7 @@ export const refresh = async (req, res) => {
 
     res.cookie('accessToken', accessToken, {
         ...cookieOpts,
-        maxAge: 30 * 60 * 1000 //30min
+        maxAge: ACCESS_TOKEN_TTL_MS //30min
     })
 
     res.status(200).json({ success: true, message: "Token created successfully!" })

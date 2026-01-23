@@ -1,3 +1,5 @@
+// Prefer same-origin /api so Vite can proxy in dev (better cookies/auth reliability).
+// You can override with VITE_API_BASE when deploying.
 const API_BASE = import.meta.env.VITE_API_BASE
   || `${window.location.origin}/api`;
 
@@ -6,17 +8,50 @@ const notifyLoader = (eventName) => {
   window.dispatchEvent(new CustomEvent(eventName));
 };
 
+let refreshPromise = null;
+
+const refreshSession = async () => {
+  if (!refreshPromise) {
+    refreshPromise = fetch(`${API_BASE}/auth/refresh`, {
+      method: "POST",
+      credentials: "include",
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          const message = data?.message || "Session refresh failed";
+          const error = new Error(message);
+          error.status = res.status;
+          throw error;
+        }
+        return res;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+
+  return refreshPromise;
+};
+
 const fetchJSON = async (path, options = {}) => {
+  const { skipAuthRefresh, ...fetchOptions } = options;
   notifyLoader("global-loader:begin");
   try {
     const res = await fetch(`${API_BASE}${path}`, {
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        ...(options.headers || {}),
+        ...(fetchOptions.headers || {}),
       },
-      ...options,
+      ...fetchOptions,
     });
+
+    if ((res.status === 401 || res.status === 403) && !skipAuthRefresh && path !== "/auth/refresh") {
+      await refreshSession();
+      return fetchJSON(path, { ...options, skipAuthRefresh: true });
+    }
+
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       const message = data?.message || "Request failed";
@@ -31,12 +66,19 @@ const fetchJSON = async (path, options = {}) => {
 };
 
 const fetchBlob = async (path, options = {}) => {
+  const { skipAuthRefresh, ...fetchOptions } = options;
   notifyLoader("global-loader:begin");
   try {
     const res = await fetch(`${API_BASE}${path}`, {
       credentials: "include",
-      ...(options || {}),
+      ...(fetchOptions || {}),
     });
+
+    if ((res.status === 401 || res.status === 403) && !skipAuthRefresh && path !== "/auth/refresh") {
+      await refreshSession();
+      return fetchBlob(path, { ...options, skipAuthRefresh: true });
+    }
+
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
       const message = data?.message || "Request failed";

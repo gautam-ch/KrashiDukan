@@ -9,24 +9,14 @@ import orderRoute from './routes/order.route.js';
 
 export const app = express();
 
-const allowedOrigins = new Set([
-      "https://krashi-dukan.vercel.app",
-      "https://www.krashi-dukan.vercel.app",
-]);
+app.use(cors({
+  origin: [
+    "https://krashi-dukan.vercel.app",
+    "https://www.krashi-dukan.vercel.app",
+  ],
+  credentials: true,
+}));
 
-const corsOptions = {
-      origin(origin, callback) {
-            if (!origin) return callback(null, true);
-            if (allowedOrigins.has(origin)) return callback(null, true);
-            return callback(new Error(`CORS blocked for origin: ${origin}`));
-      },
-      credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
-};
-
-app.use(cors(corsOptions));
-app.options(/.*/, cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 
