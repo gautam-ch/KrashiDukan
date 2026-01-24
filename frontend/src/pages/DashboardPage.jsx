@@ -8,9 +8,6 @@ import { toast } from "react-hot-toast";
 
 export function DashboardPage({
   shop,
-  productForm,
-  onProductChange,
-  onProductSubmit,
   cart,
   onCartQty,
   onCartRemove,
@@ -25,7 +22,6 @@ export function DashboardPage({
   const [showOwnerModal, setShowOwnerModal] = useState(false);
   const [ownerEmail, setOwnerEmail] = useState("");
   const [showCart, setShowCart] = useState(false);
-  const [showProductModal, setShowProductModal] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [analytics, setAnalytics] = useState(null);
   const [loadingAnalytics, setLoadingAnalytics] = useState(false);
@@ -58,7 +54,7 @@ export function DashboardPage({
         <div className="row header-actions">
           <button className="ghost" onClick={() => navigate("/search")}>Search</button>
           <button className="ghost" onClick={() => navigate("/orders")}>Orders</button>
-          <button className="ghost" onClick={() => setShowProductModal(true)}>Add product</button>
+          <button className="ghost" onClick={() => navigate("/add-product")}>Add product</button>
           <button className="ghost" onClick={() => setShowCart(true)}>Cart ({cart.length})</button>
           <button className="ghost" onClick={() => setShowOwnerModal(true)}>Add owner</button>
           {onLogout && <button className="ghost" onClick={onLogout}>Logout</button>}
@@ -78,7 +74,7 @@ export function DashboardPage({
             <div className="mobile-menu" role="menu">
               <button className="menu-item" onClick={() => { navigate("/search"); setShowMenu(false); }}>Search</button>
               <button className="menu-item" onClick={() => { navigate("/orders"); setShowMenu(false); }}>Orders</button>
-              <button className="menu-item" onClick={() => { setShowProductModal(true); setShowMenu(false); }}>Add product</button>
+              <button className="menu-item" onClick={() => { navigate("/add-product"); setShowMenu(false); }}>Add product</button>
               <button className="menu-item" onClick={() => { setShowCart(true); setShowMenu(false); }}>Cart ({cart.length})</button>
               <button className="menu-item" onClick={() => { setShowOwnerModal(true); setShowMenu(false); }}>Add owner</button>
               {onLogout && (
@@ -183,25 +179,6 @@ export function DashboardPage({
               onChange={onOrderChange}
               onSubmit={onOrderSubmit}
               disabled={cart.length === 0}
-            />
-          </div>
-        </div>
-      )}
-
-      {showProductModal && (
-        <div className="modal-backdrop" role="dialog" aria-modal="true">
-          <div className="modal card stack">
-            <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
-              <h3 style={{ margin: 0 }}>Add product</h3>
-              <button className="ghost" type="button" onClick={() => setShowProductModal(false)}>Close</button>
-            </div>
-            <ProductForm
-              value={productForm}
-              onChange={onProductChange}
-              onSubmit={async () => {
-                await onProductSubmit?.();
-                setShowProductModal(false);
-              }}
             />
           </div>
         </div>

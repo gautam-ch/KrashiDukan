@@ -7,6 +7,7 @@ import { AuthPage } from "./pages/AuthPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { HomePage } from "./pages/HomePage";
 import { SearchPage } from "./pages/SearchPage";
+import { AddProductPage } from "./pages/AddProductPage";
 import { OrdersPage } from "./pages/OrdersPage";
 
 function App() {
@@ -126,21 +127,21 @@ function App() {
     }
   };
 
-  const handleAddProduct = async () => {
+  const handleAddProduct = async (productData) => {
     if (!shop?._id) return;
     try {
-      const resolvedCategory = productForm.category === "other"
-        ? (productForm.customCategory || "").trim()
-        : productForm.category;
+      const resolvedCategory = productData.category === "other"
+        ? (productData.customCategory || "").trim()
+        : productData.category;
       const payload = {
-        ...productForm,
+        ...productData,
         category: resolvedCategory,
-        sprayCount: Number(productForm.sprayCount),
-        sellingPrice: Number(productForm.sellingPrice),
-        quantity: Number(productForm.quantity),
-        tags: productForm.tags
-          ? productForm.tags.split(',').map((t) => t.trim()).filter(Boolean)
-          : [],
+        sprayCount: Number(productData.sprayCount),
+        sellingPrice: Number(productData.sellingPrice),
+        quantity: Number(productData.quantity),
+        tags: Array.isArray(productData.tags)
+          ? productData.tags
+          : (productData.tags || "").split(',').map((t) => t.trim()).filter(Boolean),
       };
       await api.addProduct(shop._id, payload);
       setProductForm({
@@ -245,9 +246,6 @@ function App() {
 
   const dashboardProps = {
     shop,
-    productForm,
-    onProductChange: setProductForm,
-    onProductSubmit: handleAddProduct,
     onAddToCart: addToCart,
     cart,
     onCartQty: updateCartQuantity,
@@ -289,6 +287,12 @@ function App() {
           path="/orders"
           element={!authed ? <Navigate to="/auth" /> : !shop ? <Navigate to="/" /> : (
             <OrdersPage shopId={shop?._id} onLogout={handleLogout} />
+          )}
+        />
+        <Route
+          path="/add-product"
+          element={!authed ? <Navigate to="/auth" /> : !shop ? <Navigate to="/" /> : (
+            <AddProductPage onProductSubmit={handleAddProduct} />
           )}
         />
         <Route
