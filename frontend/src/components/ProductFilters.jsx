@@ -16,7 +16,8 @@ export function ProductFilters({ filters, onChange, onExportCSV, onExportPDF, on
   const update = (field, val) => onChange?.({ ...filters, [field]: val });
   return (
     <div className="row">
-      <input placeholder="Search by title" value={filters.search} onChange={(e) => update("search", e.target.value)} />
+      <input placeholder="Search by title, specifications..." value={filters.search} onChange={(e) => update("search", e.target.value)} />
+      <p className="field-note">For multiple specifications, use commas (e.g. specA, specB)</p>
       <select value={filters.category} onChange={(e) => update("category", e.target.value)} style={{ maxWidth: 180 }}>
         <option value="all">All categories</option>
         {categories.map((c) => <option key={c} value={c}>{c}</option>)}

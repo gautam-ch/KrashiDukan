@@ -16,14 +16,26 @@ const buildProductQuery = ({ shopId, search, category, sprayCount }) => {
       }
 
       if (search) {
-            const regex = new RegExp(search, "i");
-            query.$or = [
-                  { title: regex },
-                  { contents: regex },
-                  { description: regex },
-                  { category: regex },
-                  { tags: regex }
-            ];
+            const tags = search.split(',').map(tag => tag.trim()).filter(Boolean);
+            if (tags.length > 1) {
+                  const tagQueries = tags.map(tag => ({ tags: new RegExp(tag, "i") }));
+                  query.$or = [
+                        ...tagQueries,
+                        { title: new RegExp(search, "i") },
+                        { contents: new RegExp(search, "i") },
+                        { description: new RegExp(search, "i") },
+                        { category: new RegExp(search, "i") },
+                  ];
+            } else {
+                  const regex = new RegExp(search, "i");
+                  query.$or = [
+                        { title: regex },
+                        { contents: regex },
+                        { description: regex },
+                        { category: regex },
+                        { tags: regex }
+                  ];
+            }
       }
 
       return query;
@@ -69,8 +81,16 @@ export const addProduct =async(req,res)=>{
 
       if(Object.keys(errors).length>0) throw new ApiError(400,"All fields are required!",errors);
 
+      const productDetails = {
+            ...details,
+            title: details.title.trim(),
+            contents: details.contents.trim(),
+            category: details.category.trim(),
+            shopId,
+            tags: details.tags.map(tag => tag.trim())
+      };
 
-      await Product.create({...details,shopId}); 
+      await Product.create(productDetails); 
 
       res.status(201).json({success:true,message:"Product created successfully"});
 
