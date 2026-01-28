@@ -15,7 +15,15 @@ export function AddProductPage({ onProductSubmit }) {
   });
 
   const handleSubmit = async (productData) => {
-    await onProductSubmit?.(productData);
+    try {
+      await onProductSubmit?.(productData);
+    } catch {
+      // Error is already handled by the global error handler in App.jsx
+      // We catch it here to prevent the form from clearing on failure
+      return;
+    }
+
+    // Clear form only on successful submission
     setProductForm({
       title: "",
       contents: "",

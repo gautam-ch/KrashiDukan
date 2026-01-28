@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { api } from "../api/client";
@@ -45,18 +45,21 @@ export function HomePage({ authed, shop, onCreateShop, onLogout }) {
     }
   };
 
-  const fetchAnalytics = (refresh = false) => {
+  const fetchAnalytics = useCallback((refresh = false) => {
     if (!authed || !shop?._id) return;
     setLoadingAnalytics(true);
     api.getShopAnalytics(shop._id, refresh ? { refresh: true } : {})
       .then((data) => setAnalytics(data))
       .catch((err) => toast.error(err?.message || "Could not load analytics"))
       .finally(() => setLoadingAnalytics(false));
-  };
+  }, [authed, shop]);
 
   useEffect(() => {
-    fetchAnalytics(false);
-  }, [authed, shop?._id]);
+    const timer = setTimeout(() => {
+      fetchAnalytics(false);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [fetchAnalytics]);
 
   return (
     <div className="app-shell">
@@ -178,7 +181,6 @@ export function HomePage({ authed, shop, onCreateShop, onLogout }) {
       ) : (
         <div className="card hero">
           <div className="stack" style={{ gap: 12 }}>
-            <span className="pill">Multi-tenant · Offline-friendly</span>
             <h2 style={{ margin: 0 }}>Track stock, owners, expiry, and orders in one clean console.</h2>
             <p className="muted" style={{ lineHeight: 1.5 }}>
               Sign up, invite owners by email, add pesticide inventory with spray count and category tags, see expiry colors,

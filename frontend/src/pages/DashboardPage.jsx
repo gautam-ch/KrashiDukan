@@ -1,7 +1,7 @@
 import { Cart } from "../components/Cart";
 import { OrderForm } from "../components/OrderForm";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ProductForm } from "../components/ProductForm";
 import { api } from "../api/client";
 import { toast } from "react-hot-toast";
@@ -31,19 +31,21 @@ export function DashboardPage({
     return salesByMonth.reduce((max, item) => Math.max(max, item.total), 0) || 1;
   }, [salesByMonth]);
 
-  const fetchAnalytics = (refresh = false) => {
+  const fetchAnalytics = useCallback((refresh = false) => {
     if (!shop?._id) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoadingAnalytics(true);
     api.getShopAnalytics(shop._id, refresh ? { refresh: true } : {})
       .then((data) => setAnalytics(data))
       .catch((err) => toast.error(err?.message || "Could not load analytics"))
       .finally(() => setLoadingAnalytics(false));
-  };
+  }, [shop]);
 
   useEffect(() => {
-    fetchAnalytics(false);
-  }, [shop?._id]);
+    const timer = setTimeout(() => {
+      fetchAnalytics(false);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [fetchAnalytics]);
   return (
     <div className="app-shell">
       <div className="header">
@@ -54,6 +56,7 @@ export function DashboardPage({
         <div className="row header-actions">
           <button className="ghost" onClick={() => navigate("/search")}>Search</button>
           <button className="ghost" onClick={() => navigate("/orders")}>Orders</button>
+          <button className="ghost" onClick={() => navigate("/products")}>Products</button>
           <button className="ghost" onClick={() => navigate("/add-product")}>Add product</button>
           <button className="ghost" onClick={() => setShowCart(true)}>Cart ({cart.length})</button>
           <button className="ghost" onClick={() => setShowOwnerModal(true)}>Add owner</button>
@@ -74,6 +77,7 @@ export function DashboardPage({
             <div className="mobile-menu" role="menu">
               <button className="menu-item" onClick={() => { navigate("/search"); setShowMenu(false); }}>Search</button>
               <button className="menu-item" onClick={() => { navigate("/orders"); setShowMenu(false); }}>Orders</button>
+              <button className="menu-item" onClick={() => { navigate("/products"); setShowMenu(false); }}>Products</button>
               <button className="menu-item" onClick={() => { navigate("/add-product"); setShowMenu(false); }}>Add product</button>
               <button className="menu-item" onClick={() => { setShowCart(true); setShowMenu(false); }}>Cart ({cart.length})</button>
               <button className="menu-item" onClick={() => { setShowOwnerModal(true); setShowMenu(false); }}>Add owner</button>

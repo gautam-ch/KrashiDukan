@@ -4,7 +4,7 @@ import {ApiError} from "../utils/ApiError.js"
 import PDFDocument from "pdfkit";
 import mongoose from "mongoose";
 
-const buildProductQuery = ({ shopId, search, category, sprayCount }) => {
+const buildProductQuery = ({ shopId, search, title, category, sprayCount }) => {
       const query = { shopId };
 
       if (category && category !== "all") {
@@ -15,7 +15,10 @@ const buildProductQuery = ({ shopId, search, category, sprayCount }) => {
             query.sprayCount = Number(sprayCount);
       }
 
-      if (search) {
+      if (title) {
+            const regex = new RegExp(title, "i");
+            query.title = regex;
+      } else if (search) {
             const tags = search.split(',').map(tag => tag.trim()).filter(Boolean);
             if (tags.length > 1) {
                   const tagQueries = tags.map(tag => ({ tags: new RegExp(tag, "i") }));
@@ -120,6 +123,7 @@ export const getProducts= async(req,res)=>{
       const query = buildProductQuery({
             shopId,
             search: req.query.search,
+            title: req.query.title,
             category: req.query.category,
             sprayCount: req.query.sprayCount,
       });
@@ -310,4 +314,66 @@ export const exportProductsPDF = async (req, res) => {
       });
 
       doc.end();
+};
+
+export const getProductById = async (req, res) => {
+      const { shopId, productId } = req.params;
+      const userId = req.userId;
+
+      if (!userId) throw new ApiError(401, "Unauthorized user!");
+      if (!shopId || !productId) throw new ApiError(400, "Required Shop-ID and Product-ID");
+
+      const shop = await Shop.findById(shopId);
+      if (!shop) throw new ApiError(404, "Shop not found!");
+
+      const isOwner = shop.owners.some(id => id.toString() === userId);
+      if (!isOwner) throw new ApiError(403, "Forbidden");
+
+      const product = await Product.findOne({ _id: productId, shopId });
+      if (!product) throw new ApiError(404, "Product not found!");
+
+      res.status(200).json({ success: true, product, message: "Fetched product successfully" });
+};
+
+export const updateProduct = async (req, res) => {
+      const { shopId, productId } = req.params;
+      const userId = req.userId;
+      const details = req.body;
+
+      if (!userId) throw new ApiError(401, "Unauthorized user!");
+      if (!shopId || !productId) throw new ApiError(400, "Required Shop-ID and Product-ID");
+
+      const shop = await Shop.findById(shopId);
+      if (!shop) throw new ApiError(404, "Shop not found!");
+
+      const isOwner = shop.owners.some(id => id.toString() === userId);
+      if (!isOwner) throw new ApiError(403, "Forbidden");
+
+      const product = await Product.findOne({ _id: productId, shopId });
+      if (!product) throw new ApiError(404, "Product not found!");
+
+      const updatedProduct = await Product.findByIdAndUpdate(productId, details, { new: true });
+
+      res.status(200).json({ success: true, product: updatedProduct, message: "Product updated successfully" });
+};
+
+export const deleteProduct = async (req, res) => {
+      const { shopId, productId } = req.params;
+      const userId = req.userId;
+
+      if (!userId) throw new ApiError(401, "Unauthorized user!");
+      if (!shopId || !productId) throw new ApiError(400, "Required Shop-ID and Product-ID");
+
+      const shop = await Shop.findById(shopId);
+      if (!shop) throw new ApiError(404, "Shop not found!");
+
+      const isOwner = shop.owners.some(id => id.toString() === userId);
+      if (!isOwner) throw new ApiError(403, "Forbidden");
+
+      const product = await Product.findOne({ _id: productId, shopId });
+      if (!product) throw new ApiError(404, "Product not found!");
+
+      await Product.findByIdAndDelete(productId);
+
+      res.status(200).json({ success: true, message: "Product deleted successfully" });
 };

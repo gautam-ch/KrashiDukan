@@ -8,6 +8,8 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { HomePage } from "./pages/HomePage";
 import { SearchPage } from "./pages/SearchPage";
 import { AddProductPage } from "./pages/AddProductPage";
+import { ProductListPage } from "./pages/ProductListPage";
+import { EditProductPage } from "./pages/EditProductPage";
 import { OrdersPage } from "./pages/OrdersPage";
 
 function App() {
@@ -15,20 +17,6 @@ function App() {
   const [authed, setAuthed] = useState(false);
   const [shop, setShop] = useState(null);
   const [loaderCount, setLoaderCount] = useState(0);
-
-  const [productForm, setProductForm] = useState({
-    title: "",
-    contents: "",
-    img: "",
-    category: "",
-    customCategory: "",
-    sprayCount: 5,
-    costPrice: "",
-    sellingPrice: "",
-    tags: "",
-    expiryDate: "",
-    quantity: "",
-  });
 
   const [cart, setCart] = useState([]);
   const [orderForm, setOrderForm] = useState({ name: "", contact: "", village: "" });
@@ -144,22 +132,10 @@ function App() {
           : (productData.tags || "").split(',').map((t) => t.trim()).filter(Boolean),
       };
       await api.addProduct(shop._id, payload);
-      setProductForm({
-        title: "",
-        contents: "",
-        img: "",
-        category: "",
-        customCategory: "",
-        sprayCount: 5,
-        costPrice: "",
-        sellingPrice: "",
-        tags: "",
-        expiryDate: "",
-        quantity: "",
-      });
       toast.success("Product added");
     } catch (err) {
       notifyError(err, "Could not add product");
+      throw err; // re-throw to be caught in the form
     }
   };
 
@@ -287,6 +263,18 @@ function App() {
           path="/orders"
           element={!authed ? <Navigate to="/auth" /> : !shop ? <Navigate to="/" /> : (
             <OrdersPage shopId={shop?._id} onLogout={handleLogout} />
+          )}
+        />
+        <Route
+          path="/products"
+          element={!authed ? <Navigate to="/auth" /> : !shop ? <Navigate to="/" /> : (
+            <ProductListPage shopId={shop?._id} />
+          )}
+        />
+        <Route
+          path="/products/:productId/edit"
+          element={!authed ? <Navigate to="/auth" /> : !shop ? <Navigate to="/" /> : (
+            <EditProductPage shopId={shop?._id} />
           )}
         />
         <Route

@@ -15,7 +15,7 @@ const categories = [
   "other",
 ];
 
-export function ProductForm({ value, onChange, onSubmit }) {
+export function ProductForm({ value, onChange, onSubmit, isEditMode = false }) {
   const [variants, setVariants] = useState([
     { costPrice: "", sellingPrice: "", expiryDate: "", quantity: "" },
   ]);
@@ -42,19 +42,27 @@ export function ProductForm({ value, onChange, onSubmit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    variants.forEach((variant) => {
+    if (isEditMode) {
       const productData = {
         ...value,
-        ...variant,
-        tags: value.tags.split(",").map((tag) => tag.trim()),
+        tags: Array.isArray(value.tags) ? value.tags : value.tags.split(",").map((tag) => tag.trim()),
       };
       onSubmit?.(productData);
-    });
+    } else {
+      variants.forEach((variant) => {
+        const productData = {
+          ...value,
+          ...variant,
+          tags: value.tags.split(",").map((tag) => tag.trim()),
+        };
+        onSubmit?.(productData);
+      });
+    }
   };
 
   return (
     <div className="card stack">
-      <h3>Add product</h3>
+      <h3>{isEditMode ? "Edit product" : "Add product"}</h3>
       <form className="stack" onSubmit={handleSubmit}>
         <label>Title<input value={value.title} onChange={(e) => update("title", e.target.value)} required /></label>
         <label>Contents<textarea value={value.contents} onChange={(e) => update("contents", e.target.value)} required /></label>
@@ -77,38 +85,61 @@ export function ProductForm({ value, onChange, onSubmit }) {
           </label>
         )}
 
-        {variants.map((variant, index) => (
-          <div key={index} className="variant-group">
+        {isEditMode ? (
+          <>
             <div className="row">
               <label style={{ flex: 1 }}>Cost price (text)
-                <input value={variant.costPrice} onChange={(e) => handleVariantChange(index, "costPrice", e.target.value)} required />
+                <input value={value.costPrice} onChange={(e) => update("costPrice", e.target.value)} required />
               </label>
               <label style={{ flex: 1 }}>Selling price
-                <input type="number" value={variant.sellingPrice} onChange={(e) => handleVariantChange(index, "sellingPrice", e.target.value)} required />
+                <input type="number" value={value.sellingPrice} onChange={(e) => update("sellingPrice", e.target.value)} required />
               </label>
             </div>
             <div className="row">
               <label style={{ flex: 1 }}>Expiry date
-                <input type="date" value={variant.expiryDate} onChange={(e) => handleVariantChange(index, "expiryDate", e.target.value)} required />
+                <input type="date" value={value.expiryDate ? new Date(value.expiryDate).toISOString().split('T')[0] : ''} onChange={(e) => update("expiryDate", e.target.value)} required />
               </label>
               <label style={{ flex: 1 }}>Quantity
-                <input type="number" value={variant.quantity} onChange={(e) => handleVariantChange(index, "quantity", e.target.value)} required />
+                <input type="number" value={value.quantity} onChange={(e) => update("quantity", e.target.value)} required />
               </label>
             </div>
-            {variants.length > 1 && (
-              <button type="button" onClick={() => removeVariant(index)}>Remove</button>
-            )}
-          </div>
-        ))}
-        <button type="button" onClick={addVariant}>Add another variant</button>
+          </>
+        ) : (
+          variants.map((variant, index) => (
+            <div key={index} className="variant-group">
+              <div className="row">
+                <label style={{ flex: 1 }}>Cost price (text)
+                  <input value={variant.costPrice} onChange={(e) => handleVariantChange(index, "costPrice", e.target.value)} required />
+                </label>
+                <label style={{ flex: 1 }}>Selling price
+                  <input type="number" value={variant.sellingPrice} onChange={(e) => handleVariantChange(index, "sellingPrice", e.target.value)} required />
+                </label>
+              </div>
+              <div className="row">
+                <label style={{ flex: 1 }}>Expiry date
+                  <input type="date" value={variant.expiryDate} onChange={(e) => handleVariantChange(index, "expiryDate", e.target.value)} required />
+                </label>
+                <label style={{ flex: 1 }}>Quantity
+                  <input type="number" value={variant.quantity} onChange={(e) => handleVariantChange(index, "quantity", e.target.value)} required />
+                </label>
+              </div>
+              {variants.length > 1 && (
+                <button type="button" onClick={() => removeVariant(index)}>Remove</button>
+              )}
+            </div>
+          ))
+        )}
+        {!isEditMode && (
+          <button type="button" onClick={addVariant}>Add another variant</button>
+        )}
 
         <label>Specifications (comma separated)
-          <input value={value.tags} onChange={(e) => update("tags", e.target.value)} required />
+          <input value={Array.isArray(value.tags) ? value.tags.join(", ") : value.tags} onChange={(e) => update("tags", e.target.value)} required />
         </label>
         <label>Image URL (optional)
           <input value={value.img} onChange={(e) => update("img", e.target.value)} />
         </label>
-        <button type="submit">Save products</button>
+        <button type="submit">Save {isEditMode ? "product" : "products"}</button>
       </form>
     </div>
   );
