@@ -84,7 +84,7 @@ export function ProductListPage({ shopId }) {
     setHasNextPage(false);
     setTotalCount(null);
     setSearchTerm(searchInput.trim());
-    fetchProducts(1, null);
+    // Don't call fetchProducts here - let useEffect handle it
   };
 
   const handleNext = () => {
@@ -128,6 +128,11 @@ export function ProductListPage({ shopId }) {
           <input
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                handleSearch();
+              }
+            }}
             placeholder="Type product title"
           />
         </label>
