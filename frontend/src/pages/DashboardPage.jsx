@@ -90,12 +90,12 @@ export function DashboardPage({
       </div>
 
       <div className="card stack">
-        <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+        <div className="analytics-header">
           <div>
             <h3 style={{ margin: 0 }}>Analytics overview</h3>
             <p className="muted" style={{ margin: 0 }}>Full analytics snapshot for your shop.</p>
           </div>
-          <div className="row" style={{ gap: 8, alignItems: "center" }}>
+          <div className="analytics-actions">
             <button className="ghost" onClick={() => fetchAnalytics(true)} disabled={loadingAnalytics}>
               {loadingAnalytics ? "Refreshing..." : "Refresh"}
             </button>
@@ -139,7 +139,7 @@ export function DashboardPage({
                 ))}
               </div>
             </div>
-            <div style={{ overflowX: "auto" }}>
+            <div className="table-responsive">
               <table className="table">
                 <thead>
                   <tr>
@@ -150,8 +150,8 @@ export function DashboardPage({
                 <tbody>
                   {salesByMonth.map((item) => (
                     <tr key={item.label}>
-                      <td>{item.label}</td>
-                      <td>₹{Math.round(item.total)}</td>
+                      <td data-label="Month">{item.label}</td>
+                      <td data-label="Sales">₹{Math.round(item.total)}</td>
                     </tr>
                   ))}
                   {salesByMonth.length === 0 && (

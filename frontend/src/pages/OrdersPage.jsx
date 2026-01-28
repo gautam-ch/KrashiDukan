@@ -100,42 +100,45 @@ export function OrdersPage({ shopId, onLogout }) {
       </div>
 
       <div className="card stack">
-        <div className="row" style={{ justifyContent: "space-between" }}>
+        <div className="search-header">
           <div>
             <h3 style={{ margin: 0 }}>Search orders</h3>
             <p className="muted" style={{ margin: 0 }}>Search by name, contact, or village.</p>
           </div>
         </div>
-        <div className="row">
+        <div className="search-controls">
           <input
             placeholder="e.g., Rahul / 98765 / Manpura"
             value={searchDraft}
             onChange={(e) => setSearchDraft(e.target.value)}
+            style={{ flex: 1, minWidth: '200px' }}
           />
-          <button
-            type="button"
-            onClick={() => {
-              setSearch(searchDraft.trim());
-              setPage(1);
-              setActiveCursor(null);
-              setCursorStack([]);
-            }}
-          >
-            Search
-          </button>
-          <button
-            type="button"
-            className="ghost"
-            onClick={() => {
-              setSearchDraft("");
-              setSearch("");
-              setPage(1);
-              setActiveCursor(null);
-              setCursorStack([]);
-            }}
-          >
-            Clear
-          </button>
+          <div className="search-buttons">
+            <button
+              type="button"
+              onClick={() => {
+                setSearch(searchDraft.trim());
+                setPage(1);
+                setActiveCursor(null);
+                setCursorStack([]);
+              }}
+            >
+              Search
+            </button>
+            <button
+              type="button"
+              className="ghost"
+              onClick={() => {
+                setSearchDraft("");
+                setSearch("");
+                setPage(1);
+                setActiveCursor(null);
+                setCursorStack([]);
+              }}
+            >
+              Clear
+            </button>
+          </div>
         </div>
       </div>
 

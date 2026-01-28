@@ -32,14 +32,14 @@ export function OrderHistory({ orders }) {
 
   return (
     <div className="card stack">
-      <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+      <div className="order-header">
         <h3>Order history</h3>
-        <div className="row">
+        <div className="export-buttons">
           <button className="ghost" onClick={exportCSV}>Download CSV</button>
           <button className="ghost" onClick={exportPDF}>Download PDF</button>
         </div>
       </div>
-      <div style={{ overflowX: "auto" }}>
+      <div className="table-responsive">
         <table className="table">
           <thead>
             <tr>
@@ -54,12 +54,12 @@ export function OrderHistory({ orders }) {
           <tbody>
             {orders.map((o) => (
               <tr key={o._id}>
-                <td>{o.name}</td>
-                <td>{o.contact}</td>
-                <td>{o.village}</td>
-                <td>{o.totalAmount}</td>
-                <td>{(o.items || []).map((i) => `${i.productName} x${i.quantity}`).join(", ")}</td>
-                <td>{formatDate(o.createdAt)}</td>
+                <td data-label="Name">{o.name}</td>
+                <td data-label="Contact">{o.contact}</td>
+                <td data-label="Village">{o.village}</td>
+                <td data-label="Total">₹{o.totalAmount}</td>
+                <td data-label="Items">{(o.items || []).map((i) => `${i.productName} x${i.quantity}`).join(", ")}</td>
+                <td data-label="Date">{formatDate(o.createdAt)}</td>
               </tr>
             ))}
             {orders.length === 0 && (
