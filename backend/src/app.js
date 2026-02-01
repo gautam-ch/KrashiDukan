@@ -11,6 +11,7 @@ export const app = express();
 
 app.use(cors({
   origin: [
+    "https://krashi-dukan-git-main-gautams-projects-b7eef1c8.vercel.app/",
     "https://krashi-dukan.vercel.app",
     "https://www.krashi-dukan.vercel.app",
   ],
