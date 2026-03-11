@@ -57,6 +57,7 @@ export function DashboardPage({
           <button className="ghost" onClick={() => navigate("/search")}>Search</button>
           <button className="ghost" onClick={() => navigate("/orders")}>Orders</button>
           <button className="ghost" onClick={() => navigate("/products")}>Products</button>
+          <button className="ghost" onClick={() => navigate("/sales")}>Sales</button>
           <button className="ghost" onClick={() => navigate("/add-product")}>Add product</button>
           <button className="ghost" onClick={() => setShowCart(true)}>Cart ({cart.length})</button>
           <button className="ghost" onClick={() => setShowOwnerModal(true)}>Add owner</button>
@@ -78,6 +79,7 @@ export function DashboardPage({
               <button className="menu-item" onClick={() => { navigate("/search"); setShowMenu(false); }}>Search</button>
               <button className="menu-item" onClick={() => { navigate("/orders"); setShowMenu(false); }}>Orders</button>
               <button className="menu-item" onClick={() => { navigate("/products"); setShowMenu(false); }}>Products</button>
+              <button className="menu-item" onClick={() => { navigate("/sales"); setShowMenu(false); }}>Sales</button>
               <button className="menu-item" onClick={() => { navigate("/add-product"); setShowMenu(false); }}>Add product</button>
               <button className="menu-item" onClick={() => { setShowCart(true); setShowMenu(false); }}>Cart ({cart.length})</button>
               <button className="menu-item" onClick={() => { setShowOwnerModal(true); setShowMenu(false); }}>Add owner</button>

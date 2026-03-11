@@ -110,9 +110,8 @@ export const api = {
   getMyShop: () => fetchJSON("/shop/me"),
   createShop: (name) => fetchJSON("/createShop", { method: "POST", body: JSON.stringify({ name }) }),
   addOwner: (email) => fetchJSON("/addOwner", { method: "POST", body: JSON.stringify({ email }) }),
-  getShopAnalytics: (shopId, options = {}) => (
-    fetchJSON(`/shops/${shopId}/analytics${buildQuery(options)}`)
-  ),
+  getShopAnalytics: (shopId, options = {}) => fetchJSON(`/shops/${shopId}/analytics${buildQuery(options)}`),
+  getSalesAnalytics: (shopId, params = {}) => fetchJSON(`/analytics/sales/${shopId}${buildQuery(params)}`),
   getProducts: (shopId, params = {}) => fetchJSON(`/shops/${shopId}/products${buildQuery(params)}`),
   searchProducts: (shopId, params = {}) => fetchJSON(`/shops/${shopId}/products${buildQuery(params)}`),
   addProduct: (shopId, body) => fetchJSON(`/shops/${shopId}/product`, { method: "POST", body: JSON.stringify(body) }),

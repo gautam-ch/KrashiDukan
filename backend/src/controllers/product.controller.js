@@ -89,6 +89,7 @@ export const addProduct =async(req,res)=>{
             title: details.title.trim(),
             contents: details.contents.trim(),
             category: details.category.trim(),
+            costPrice: String(details.costPrice).trim(),
             shopId,
             tags: details.tags.map(tag => tag.trim())
       };

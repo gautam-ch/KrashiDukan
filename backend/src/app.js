@@ -6,6 +6,7 @@ import authRoute from './routes/auth.route.js';
 import shopRoute from './routes/shop.route.js';
 import productRoute from './routes/product.route.js';
 import orderRoute from './routes/order.route.js';
+import analyticsRoute from "./routes/analytics.route.js";
 
 export const app = express();
 
@@ -29,5 +30,6 @@ app.use('/auth',authRoute);
 app.use(shopRoute);
 app.use(productRoute);
 app.use(orderRoute);
+app.use(analyticsRoute);
 
 app.use(errorHandler);

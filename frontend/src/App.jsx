@@ -11,6 +11,7 @@ import { AddProductPage } from "./pages/AddProductPage";
 import { ProductListPage } from "./pages/ProductListPage";
 import { EditProductPage } from "./pages/EditProductPage";
 import { OrdersPage } from "./pages/OrdersPage";
+import { SalesPage } from "./pages/SalesPage";
 
 function App() {
   const navigate = useNavigate();
@@ -269,6 +270,12 @@ function App() {
           path="/products"
           element={!authed ? <Navigate to="/auth" /> : !shop ? <Navigate to="/" /> : (
             <ProductListPage shopId={shop?._id} />
+          )}
+        />
+        <Route
+          path="/sales"
+          element={!authed ? <Navigate to="/auth" /> : !shop ? <Navigate to="/" /> : (
+            <SalesPage shop={shop} />
           )}
         />
         <Route
