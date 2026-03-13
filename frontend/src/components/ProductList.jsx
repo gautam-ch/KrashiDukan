@@ -1,35 +1,5 @@
 import { formatDate, monthsUntil } from "../api/client";
 
-const decodeCostPrice = (encodedStr) => {
-  if (encodedStr === undefined || encodedStr === null || encodedStr === "") return null;
-  const map = {
-    Z: 0, z: 0,
-    O: 1, o: 1,
-    T: 2, t: 2,
-    R: 3, r: 3,
-    F: 4, f: 4,
-    I: 5, i: 5,
-    S: 6, s: 6,
-    C: 7, c: 7,
-    E: 8, e: 8,
-    N: 9, n: 9,
-  };
-
-  let decoded = "";
-  for (const char of String(encodedStr)) {
-    if (map[char] !== undefined) {
-      decoded += map[char];
-    } else if (!Number.isNaN(Number(char)) && char !== " ") {
-      decoded += char;
-    } else if (char === ".") {
-      decoded += char;
-    }
-  }
-
-  const parsed = Number.parseFloat(decoded);
-  return Number.isFinite(parsed) ? parsed : null;
-};
-
 export function ProductList({ products, onAddToCart }) {
   const expiryStatus = (product) => {
     const months = monthsUntil(product.expiryDate);
@@ -41,7 +11,6 @@ export function ProductList({ products, onAddToCart }) {
   return (
     <div className="list">
       {products.map((p) => {
-        const decodedCost = decodeCostPrice(p.costPrice);
         return (
         <div key={p._id} className={`standard-card ${expiryStatus(p)}`}>
           {/* Title - Always at top */}
@@ -75,7 +44,7 @@ export function ProductList({ products, onAddToCart }) {
             <div className="detail-item">
               <span className="detail-label">Cost Price</span>
               <span className="detail-value">
-                {decodedCost === null ? "-" : `₹${decodedCost}`}
+                {p.costPrice || "-"}
               </span>
             </div>
           </div>
