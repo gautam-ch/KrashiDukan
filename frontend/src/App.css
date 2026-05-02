@@ -13,15 +13,8 @@
 	justify-content: space-between;
 }
 
-.header-actions {
-	display: flex;
-	gap: 10px;
-	flex-wrap: wrap;
-	align-items: center;
-}
-
 .header-menu {
-	display: none;
+	display: block;
 	position: relative;
 }
 
@@ -692,14 +685,6 @@ button.danger:hover {
 	}
 	.header-menu .hamburger {
 		margin-top: 2px;
-	}
-
-	.header-actions {
-		display: none;
-	}
-
-	.header-menu {
-		display: block;
 	}
 
 	.list {

@@ -73,11 +73,6 @@ export function OrdersPage({ shopId, onLogout }) {
           <p className="muted" style={{ margin: 0 }}>Krashi Dukan</p>
           <h1 className="title">Order history</h1>
         </div>
-        <div className="row header-actions">
-          <button className="ghost" onClick={() => navigate("/dashboard")}>Dashboard</button>
-          <button className="ghost" onClick={() => navigate("/search")}>Search</button>
-          <button className="ghost" onClick={onLogout}>Logout</button>
-        </div>
         <div className="header-menu">
           <button
             className="hamburger"

@@ -4,6 +4,7 @@ import { ProductForm } from "../components/ProductForm";
 
 export function AddProductPage({ onProductSubmit }) {
   const navigate = useNavigate();
+  const [showMenu, setShowMenu] = useState(false);
   const [productForm, setProductForm] = useState({
     title: "",
     contents: "",
@@ -42,8 +43,27 @@ export function AddProductPage({ onProductSubmit }) {
           <p className="muted" style={{ margin: 0 }}>Krashi Dukan</p>
           <h1 className="title">Add New Product</h1>
         </div>
-        <div className="row header-actions">
-          <button className="ghost" onClick={() => navigate("/dashboard")}>Dashboard</button>
+        <div className="header-menu">
+          <button
+            className="hamburger"
+            type="button"
+            onClick={() => setShowMenu((v) => !v)}
+            aria-haspopup="menu"
+            aria-expanded={showMenu}
+            aria-label="Open navigation menu"
+          >
+            ☰
+          </button>
+          {showMenu && (
+            <div className="mobile-menu" role="menu">
+              <button className="menu-item" onClick={() => { navigate("/dashboard"); setShowMenu(false); }}>Dashboard</button>
+              <button className="menu-item" onClick={() => { navigate("/products"); setShowMenu(false); }}>Products</button>
+              <button className="menu-item" onClick={() => { navigate("/search"); setShowMenu(false); }}>Search</button>
+              <button className="menu-item" onClick={() => { navigate("/orders"); setShowMenu(false); }}>Orders</button>
+              <button className="menu-item" onClick={() => { navigate("/sales"); setShowMenu(false); }}>Sales</button>
+              <button className="menu-item" onClick={() => { navigate("/expired-products"); setShowMenu(false); }}>Expired products</button>
+            </div>
+          )}
         </div>
       </div>
       <div className="card-container">

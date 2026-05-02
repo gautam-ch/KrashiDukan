@@ -4,8 +4,34 @@ import {ApiError} from "../utils/ApiError.js"
 import PDFDocument from "pdfkit";
 import mongoose from "mongoose";
 
-const buildProductQuery = ({ shopId, search, title, category, sprayCount }) => {
+const getStartOfToday = (localDateString) => {
+      if (localDateString) {
+            const tempDate = new Date(localDateString);
+            if (!Number.isNaN(tempDate.getTime())) {
+                  tempDate.setHours(0, 0, 0, 0);
+                  return tempDate;
+            }
+      }
+      const now = new Date();
+      // Using UTC fallback if client local date is missing
+      now.setUTCHours(0, 0, 0, 0);
+      return now;
+};
+
+const parseAmount = (value) => {
+      if (value === null || value === undefined) return 0;
+      if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+      const cleaned = String(value).replace(/[^0-9.-]/g, "");
+      const parsed = Number.parseFloat(cleaned);
+      return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const buildProductQuery = ({ shopId, search, title, category, sprayCount, excludeExpired = false, currentDate }) => {
       const query = { shopId };
+
+      if (excludeExpired) {
+            query.expiryDate = { $gte: getStartOfToday(currentDate) };
+      }
 
       if (category && category !== "all") {
             query.category = category;
@@ -127,6 +153,8 @@ export const getProducts= async(req,res)=>{
             title: req.query.title,
             category: req.query.category,
             sprayCount: req.query.sprayCount,
+            excludeExpired: req.query.excludeExpired === "true",
+            currentDate: req.query.currentDate
       });
       let pagedQuery = query;
       let cursorDate = null;
@@ -181,6 +209,52 @@ export const getProducts= async(req,res)=>{
       })
 
 }
+
+export const getExpiredProducts = async (req, res) => {
+      const shopId = req.params.shopId;
+      const userId = req.userId;
+
+      if (!userId) throw new ApiError(401, "Unauthorized user!");
+      if (!shopId) throw new ApiError(400, "Required Shop-ID");
+
+      const shop = await Shop.findById(shopId);
+      if (!shop) throw new ApiError(404, "Shop not found !");
+
+      const isOwner = shop.owners.some(
+            id => id.toString() === userId
+      );
+      if (!isOwner) throw new ApiError(403, "Forbidden");
+
+      const limit = Number(req.query.limit) || 0;
+      const baseQuery = {
+            shopId,
+            expiryDate: { $lt: getStartOfToday(req.query.currentDate) }
+      };
+
+      let query = Product.find(baseQuery).sort({ expiryDate: 1, _id: 1 });
+      if (limit > 0) {
+            query = query.limit(Math.min(500, Math.max(1, limit)));
+      }
+
+      const products = await query;
+      const totalCount = await Product.countDocuments(baseQuery);
+      
+      let totalLoss = 0;
+      const cursor = Product.find(baseQuery, { costPrice: 1, quantity: 1 }).cursor();
+      for await (const p of cursor) {
+            const cost = parseAmount(p.costPrice);
+            const qty = Number(p.quantity || 0);
+            totalLoss += (cost * qty);
+      }
+
+      res.status(200).json({
+            success: true,
+            products,
+            totalCount,
+            totalLoss,
+            message: "fetched expired products successfully"
+      });
+};
 
 export const exportProductsCSV = async (req, res) => {
       const shopId = req.params.shopId;

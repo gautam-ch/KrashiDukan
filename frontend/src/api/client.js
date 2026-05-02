@@ -114,6 +114,7 @@ export const api = {
   getSalesAnalytics: (shopId, params = {}) => fetchJSON(`/analytics/sales/${shopId}${buildQuery(params)}`),
   getProducts: (shopId, params = {}) => fetchJSON(`/shops/${shopId}/products${buildQuery(params)}`),
   searchProducts: (shopId, params = {}) => fetchJSON(`/shops/${shopId}/products${buildQuery(params)}`),
+  getExpiredProducts: (shopId, params = {}) => fetchJSON(`/shops/${shopId}/products/expired${buildQuery(params)}`),
   addProduct: (shopId, body) => fetchJSON(`/shops/${shopId}/product`, { method: "POST", body: JSON.stringify(body) }),
   getProduct: (shopId, productId) => fetchJSON(`/shops/${shopId}/product/${productId}`),
   updateProduct: (shopId, productId, body) => fetchJSON(`/shops/${shopId}/product/${productId}`, { method: "PUT", body: JSON.stringify(body) }),

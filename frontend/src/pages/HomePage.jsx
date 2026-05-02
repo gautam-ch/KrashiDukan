@@ -68,38 +68,6 @@ export function HomePage({ authed, shop, onCreateShop, onLogout }) {
           <p className="muted" style={{ margin: 0 }}>Krashi Dukan</p>
           <h1 className="title">Pesticide shop assistant</h1>
         </div>
-        <div className="row header-actions" style={{ position: "relative" }}>
-          {authed ? (
-            <>
-              {shop && <button className="ghost" onClick={() => navigate("/dashboard")}>Dashboard</button>}
-              {!shop && <button className="ghost" onClick={openModal}>Create shop</button>}
-              <button
-                className="avatar"
-                onClick={() => setShowMenu((v) => !v)}
-                aria-haspopup="menu"
-                aria-expanded={showMenu}
-              >
-                {"You".charAt(0)}
-              </button>
-              {showMenu && (
-                <div className="menu" role="menu">
-                  {shop ? (
-                    <button className="menu-item" onClick={() => { navigate("/dashboard"); setShowMenu(false); }}>
-                      Dashboard
-                    </button>
-                  ) : (
-                    <button className="menu-item" onClick={() => { openModal(); setShowMenu(false); }}>
-                      Create shop
-                    </button>
-                  )}
-                  <button className="menu-item" onClick={() => { onLogout(); setShowMenu(false); }}>
-                    Logout
-                  </button>
-                </div>
-              )}
-            </>
-          ) : null}
-        </div>
         {authed && (
           <div className="header-menu">
             <button

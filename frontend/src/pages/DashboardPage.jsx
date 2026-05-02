@@ -53,16 +53,6 @@ export function DashboardPage({
           <p className="muted" style={{ margin: 0 }}>Krashi Dukan</p>
           <h1 className="title">Pesticide shop console</h1>
         </div>
-        <div className="row header-actions">
-          <button className="ghost" onClick={() => navigate("/search")}>Search</button>
-          <button className="ghost" onClick={() => navigate("/orders")}>Orders</button>
-          <button className="ghost" onClick={() => navigate("/products")}>Products</button>
-          <button className="ghost" onClick={() => navigate("/sales")}>Sales</button>
-          <button className="ghost" onClick={() => navigate("/add-product")}>Add product</button>
-          <button className="ghost" onClick={() => setShowCart(true)}>Cart ({cart.length})</button>
-          <button className="ghost" onClick={() => setShowOwnerModal(true)}>Add owner</button>
-          {onLogout && <button className="ghost" onClick={onLogout}>Logout</button>}
-        </div>
         <div className="header-menu">
           <button
             className="hamburger"
@@ -77,6 +67,7 @@ export function DashboardPage({
           {showMenu && (
             <div className="mobile-menu" role="menu">
               <button className="menu-item" onClick={() => { navigate("/search"); setShowMenu(false); }}>Search</button>
+              <button className="menu-item" onClick={() => { navigate("/expired-products"); setShowMenu(false); }}>Expired products</button>
               <button className="menu-item" onClick={() => { navigate("/orders"); setShowMenu(false); }}>Orders</button>
               <button className="menu-item" onClick={() => { navigate("/products"); setShowMenu(false); }}>Products</button>
               <button className="menu-item" onClick={() => { navigate("/sales"); setShowMenu(false); }}>Sales</button>

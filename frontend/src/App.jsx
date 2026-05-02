@@ -7,6 +7,7 @@ import { AuthPage } from "./pages/AuthPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { HomePage } from "./pages/HomePage";
 import { SearchPage } from "./pages/SearchPage";
+import { ExpiredProductsPage } from "./pages/ExpiredProductsPage";
 import { AddProductPage } from "./pages/AddProductPage";
 import { ProductListPage } from "./pages/ProductListPage";
 import { EditProductPage } from "./pages/EditProductPage";
@@ -264,6 +265,12 @@ function App() {
           path="/orders"
           element={!authed ? <Navigate to="/auth" /> : !shop ? <Navigate to="/" /> : (
             <OrdersPage shopId={shop?._id} onLogout={handleLogout} />
+          )}
+        />
+        <Route
+          path="/expired-products"
+          element={!authed ? <Navigate to="/auth" /> : !shop ? <Navigate to="/" /> : (
+            <ExpiredProductsPage shopId={shop?._id} onLogout={handleLogout} />
           )}
         />
         <Route

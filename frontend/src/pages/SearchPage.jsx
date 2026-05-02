@@ -29,6 +29,8 @@ export function SearchPage({ shopId, onAddToCart, onLogout }) {
       const params = {
         ...nextFilters,
         limit: 20,
+        excludeExpired: true,
+        currentDate: new Date().toISOString(),
       };
       if (cursor?.cursor && cursor?.cursorId) {
         params.cursor = cursor.cursor;
@@ -108,11 +110,6 @@ export function SearchPage({ shopId, onAddToCart, onLogout }) {
           <p className="muted" style={{ margin: 0 }}>Krashi Dukan</p>
           <h1 className="title">Search products</h1>
         </div>
-        <div className="row header-actions">
-          <button className="ghost" onClick={() => navigate("/dashboard")}>Dashboard</button>
-          <button className="ghost" onClick={() => navigate("/orders")}>Orders</button>
-          <button className="ghost" onClick={onLogout}>Logout</button>
-        </div>
         <div className="header-menu">
           <button
             className="hamburger"
@@ -127,6 +124,7 @@ export function SearchPage({ shopId, onAddToCart, onLogout }) {
           {showMenu && (
             <div className="mobile-menu" role="menu">
               <button className="menu-item" onClick={() => { navigate("/dashboard"); setShowMenu(false); }}>Dashboard</button>
+              <button className="menu-item" onClick={() => { navigate("/expired-products"); setShowMenu(false); }}>Expired products</button>
               <button className="menu-item" onClick={() => { navigate("/orders"); setShowMenu(false); }}>Orders</button>
               <button className="menu-item" onClick={() => { onLogout?.(); setShowMenu(false); }}>Logout</button>
             </div>

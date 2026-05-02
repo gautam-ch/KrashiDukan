@@ -7,6 +7,7 @@ export function ProductListPage({ shopId }) {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -115,11 +116,27 @@ export function ProductListPage({ shopId }) {
           <p className="muted" style={{ margin: 0 }}>Krashi Dukan</p>
           <h1 className="title">Manage Products</h1>
         </div>
-        <div className="row header-actions">
-          <button className="ghost" onClick={() => fetchProducts(true)} disabled={loading}>
-            {loading ? "Refreshing..." : "Refresh"}
+        <div className="header-menu">
+          <button
+            className="hamburger"
+            type="button"
+            onClick={() => setShowMenu((v) => !v)}
+            aria-haspopup="menu"
+            aria-expanded={showMenu}
+            aria-label="Open navigation menu"
+          >
+            ☰
           </button>
-          <button className="ghost" onClick={() => navigate("/dashboard")}>Dashboard</button>
+          {showMenu && (
+            <div className="mobile-menu" role="menu">
+              <button className="menu-item" onClick={() => { navigate("/dashboard"); setShowMenu(false); }}>Dashboard</button>
+              <button className="menu-item" onClick={() => { navigate("/search"); setShowMenu(false); }}>Search</button>
+              <button className="menu-item" onClick={() => { navigate("/orders"); setShowMenu(false); }}>Orders</button>
+              <button className="menu-item" onClick={() => { navigate("/sales"); setShowMenu(false); }}>Sales</button>
+              <button className="menu-item" onClick={() => { navigate("/add-product"); setShowMenu(false); }}>Add product</button>
+              <button className="menu-item" onClick={() => { navigate("/expired-products"); setShowMenu(false); }}>Expired products</button>
+            </div>
+          )}
         </div>
       </div>
       <div className="card filter-bar">

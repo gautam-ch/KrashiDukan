@@ -7,6 +7,7 @@ export function SalesPage({ shop }) {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -32,6 +33,7 @@ export function SalesPage({ shop }) {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shop]);
 
   const handleFilter = (e) => {
@@ -46,8 +48,27 @@ export function SalesPage({ shop }) {
           <p className="muted" style={{ margin: 0 }}>Krashi Dukan</p>
           <h1 className="title">Sales Analytics</h1>
         </div>
-        <div className="row header-actions">
-          <button className="ghost" onClick={() => navigate("/")}>Dashboard</button>
+        <div className="header-menu">
+          <button
+            className="hamburger"
+            type="button"
+            onClick={() => setShowMenu((v) => !v)}
+            aria-haspopup="menu"
+            aria-expanded={showMenu}
+            aria-label="Open navigation menu"
+          >
+            ☰
+          </button>
+          {showMenu && (
+            <div className="mobile-menu" role="menu">
+              <button className="menu-item" onClick={() => { navigate("/dashboard"); setShowMenu(false); }}>Dashboard</button>
+              <button className="menu-item" onClick={() => { navigate("/search"); setShowMenu(false); }}>Search</button>
+              <button className="menu-item" onClick={() => { navigate("/orders"); setShowMenu(false); }}>Orders</button>
+              <button className="menu-item" onClick={() => { navigate("/products"); setShowMenu(false); }}>Products</button>
+              <button className="menu-item" onClick={() => { navigate("/add-product"); setShowMenu(false); }}>Add product</button>
+              <button className="menu-item" onClick={() => { navigate("/expired-products"); setShowMenu(false); }}>Expired products</button>
+            </div>
+          )}
         </div>
       </div>
 
